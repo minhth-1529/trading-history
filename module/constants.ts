@@ -10,13 +10,9 @@ export enum ORDER_ENUM {
     'BUY_LIMIT' = 'buy_limit'
 }
 
-export const ORDER_VALUE = {
-    'sell':{
-        label: 'SELL',
-        value: 'sell'
-    },
-    'buy':{
-        label: 'BUY',
-        value: 'buy'
-    }
+export const orderColor = {
+    [ORDER_ENUM.SELL]: 'bg-red-100 text-red-700',
+    [ORDER_ENUM.BUY]: 'bg-green-100 text-green-700',
+    [ORDER_ENUM.BUY_LIMIT]: 'bg-cyan-100 text-cyan-700',
+    [ORDER_ENUM.SELL_LIMIT]: 'bg-fuchsia-100 text-fuchsia-700'
 }
