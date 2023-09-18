@@ -1,113 +1,129 @@
-import Image from 'next/image'
+'use client'
+import {Button, DatePicker, Form, Input, InputNumber, Modal, Select, Table} from "antd";
+import {ColumnsType} from "antd/es/table";
+import {assign, upperCase, values} from "lodash";
+import {ORDER_ENUM, PAIR_ENUM} from "@/module/constants";
+import {useEffect, useState} from "react";
+import {v4 as uuidv4} from 'uuid';
+import dayjs from "dayjs";
+import cls from 'classnames'
+import {useLocalStorage} from 'react-use';
+import stringToHexColor from "@/app/util/stringToHexColor";
+
+interface DataType {
+    id: string;
+    pair: PAIR_ENUM;
+    order: ORDER_ENUM;
+    date: string,
+    tp: number,
+    rule: boolean
+}
+
+const columns: ColumnsType<DataType> = [
+    {
+        title: 'Pair',
+        dataIndex: 'pair',
+        key: 'pair',
+        width: 100,
+        render: (value) => <span
+            className={'inline-flex items-center rounded-md  px-2 py-1 text-xs font-medium text-white'}
+            style={{backgroundColor: stringToHexColor(value) as string}}>{value.toLocaleUpperCase()}</span>,
+    },
+    {
+        title: 'Order',
+        dataIndex: 'order',
+        key: 'order',
+        render: value => <span
+            className={'inline-flex items-center rounded-md  px-2 py-1 text-xs font-medium text-white'}
+            style={{backgroundColor: stringToHexColor(value) as string}}>{upperCase(value)}</span>
+    },
+    {
+        title: 'Date',
+        dataIndex: 'date',
+        key: 'date',
+        render: value => dayjs(value).format('DD/MM/YYYY')
+    },
+    {
+        title: 'TP',
+        dataIndex: 'tp',
+        key: 'tp',
+        render: value => <span
+            className={cls('inline-flex items-center rounded-md  px-2 py-1 text-xs font-medium', {'bg-green-100 text-green-700': value > 0}, {'bg-red-100 text-red-700': value < 0})}>{value}</span>
+    },
+    {
+        title: 'Rule',
+        dataIndex: 'rule',
+        key: 'rule',
+        render: value =><span>{value ? 'True' : 'False'}</span>
+    }
+];
 
 export default function Home() {
-  return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">app/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
+    const [form] = Form.useForm<DataType>();
+    const [open, setOpen] = useState<boolean>(false)
+    const [value, setValue] = useLocalStorage<string>('data', '')
+    const [data, setData] = useState<DataType[]>([])
 
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 before:lg:h-[360px] z-[-1]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
 
-      <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Docs{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
+    const onFinish = (value: DataType) => {
+        const values = [...data,assign(value, {date: dayjs(value.date).format()})]
+        setData(values)
+        setValue(JSON.stringify(values))
+        setOpen(false)
+    }
 
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Learn{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
+    useEffect(() => {
+        if (value) {
+            setData(JSON.parse(value))
+        }
+    }, [value]);
 
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Templates{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Explore the Next.js 13 playground.
-          </p>
-        </a>
 
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Deploy{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
-  )
+    const afterClose = () => {
+        form.resetFields();
+    }
+
+    return (
+        <main className="p-5">
+            <Button onClick={() => setOpen(true)} type={'primary'}>Add</Button>
+            <Table columns={columns} rowKey={'id'} dataSource={data}/>
+            <Modal
+                title={'Add New'}
+                open={open}
+                onCancel={() => setOpen(false)}
+                onOk={form.submit}
+                afterClose={afterClose}
+            >
+                <Form onFinish={onFinish} form={form} labelCol={{span: 4}}
+                      wrapperCol={{span: 20}}>
+                    <Form.Item hidden={true} name='id' initialValue={uuidv4()}>
+                        <Input/>
+                    </Form.Item>
+                    <Form.Item label={'Pair'} name={'pair'}>
+                        <Select
+                            options={values(PAIR_ENUM).map(item => ({
+                                label: item.toLocaleUpperCase(),
+                                value: item
+                            }))}
+                        />
+                    </Form.Item>
+                    <Form.Item label={'Order'} name={'order'}>
+                        <Select options={values(ORDER_ENUM).map(item => ({
+                            label: upperCase(item),
+                            value: item
+                        }))}/>
+                    </Form.Item>
+                    <Form.Item label={'Date'} name={'date'}>
+                        <DatePicker format={'DD/MM/YYYY'} className={'w-full'}/>
+                    </Form.Item>
+                    <Form.Item label={'Take Profit'} name={'tp'}>
+                        <InputNumber className={'!w-full'}/>
+                    </Form.Item>
+                    <Form.Item label={'Rule'} name={'rule'}>
+                        <Select options={[{label: 'True', value: true}, {label: 'False', value: false}]}/>
+                    </Form.Item>
+                </Form>
+            </Modal>
+        </main>
+    )
 }
