@@ -44,7 +44,7 @@ const columns: ColumnsType<DataType> = [
         title: 'Date',
         dataIndex: 'date',
         key: 'date',
-        render: value => dayjs(value).format('DD/MM/YYYY')
+        render: value => dayjs(value).format('DD/MM/YYYY HH:mm')
     },
     {
         title: 'TP',
@@ -131,7 +131,8 @@ export default function Home() {
                         }))}/>
                     </Form.Item>
                     <Form.Item rules={[{required: true, message: 'This field is required'}]} label={'Date'} name={'date'}>
-                        <DatePicker format={'DD/MM/YYYY'} className={'w-full'}/>
+                        <DatePicker showTime={{ format: 'HH:mm' }}
+                                    format="YYYY/MM/DD HH:mm" className={'w-full'}/>
                     </Form.Item>
                     <Form.Item rules={[{required: true, message: 'This field is required'}]} label={'Take Profit'} name={'tp'}>
                         <InputNumber className={'!w-full'}/>
