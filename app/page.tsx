@@ -9,6 +9,7 @@ import dayjs from "dayjs";
 import cls from 'classnames'
 import {useLocalStorage} from 'react-use';
 import stringToHexColor from "@/app/util/stringToHexColor";
+import * as fs from 'fs';
 
 interface DataType {
     id: string;
@@ -78,9 +79,16 @@ export default function Home() {
     const [data, setData] = useState<DataType[]>([])
 
 
-    const onFinish = (value: DataType) => {
+    const onFinish =  (value: DataType) => {
         const values = [assign(value, {date: dayjs(value.date).format()}),...data]
         setData(values)
+        fs.writeFile(`data.json`, JSON.stringify(values), function (err) {
+            if (err) {
+                return console.log(err);
+            }
+
+            console.log(`roles.constant.ts was downloaded and generated!`);
+        });
         setValue(JSON.stringify(values))
         setOpen(false)
     }
