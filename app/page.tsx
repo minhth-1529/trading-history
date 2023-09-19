@@ -30,45 +30,43 @@ const headers = {
     "X-ACCESS-KEY": ACCESS_KEY
 }
 
-const fetchData = async () =>{
+const fetchData = async () => {
     return axios.get(`https://api.jsonbin.io/v3/b/${ID}`, {headers})
 }
 
-const updateData = async (data: DataType[]) =>{
+const updateData = async (data: DataType[]) => {
     await axios.put(`https://api.jsonbin.io/v3/b/${ID}`, data, {
         headers
-    }).then(res=>console.log(res)).catch(err=>console.log(err))
+    }).then(res => console.log(res)).catch(err => console.log(err))
 }
 
-const handleUpdate = (data: DataType[]) =>{
+const handleUpdate = (data: DataType[]) => {
     updateData(data).then()
 }
 
 export default function Home() {
     const [form] = Form.useForm<DataType>();
-    const [loading,setLoading] = useState<boolean>(true)
+    const [loading, setLoading] = useState<boolean>(true)
     const [open, setOpen] = useState<boolean>(false)
     const [data, setData] = useState<DataType[]>([])
 
-    const onFinish =  (value: DataType) => {
-        const values = [assign(value, {date: dayjs(value.date).format()}),...data]
+    const onFinish = (value: DataType) => {
+        const values = [assign(value, {date: dayjs(value.date).format()}), ...data]
 
         setData(values)
         handleUpdate(values)
         setOpen(false)
     }
 
-    const handleDelete = (id: string)=>{
-        const value = data.filter(item=>item.id !== id)
+    const handleDelete = (id: string) => {
+        const value = data.filter(item => item.id !== id)
 
-        if (isEmpty(value)){
+        if (isEmpty(value)) {
             return message.error('Can not delete the last one!').then()
         }
 
-
         setData(value)
         handleUpdate(value)
-        
     }
 
     const afterClose = () => {
@@ -76,8 +74,8 @@ export default function Home() {
     }
 
     useEffect(() => {
-        fetchData().then(res=> {
-            setData(get(res,'data.record',[]))
+        fetchData().then(res => {
+            setData(get(res, 'data.record', []))
             setLoading(false)
         });
     }, []);
@@ -85,7 +83,8 @@ export default function Home() {
 
     return !loading ? (
         <main className="p-5">
-            <div className={'flex justify-end mb-5'}><Button onClick={() => setOpen(true)} type={'primary'}>Add</Button></div>
+            <div className={'flex justify-end mb-5'}><Button onClick={() => setOpen(true)} type={'primary'}>Add</Button>
+            </div>
             <Table columns={[
                 {
                     title: 'Pair',
@@ -122,7 +121,8 @@ export default function Home() {
                     title: 'Rule',
                     dataIndex: 'rule',
                     key: 'rule',
-                    render: value => <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ${value ? 'bg-blue-100 text-blue-700' : 'bg-rose-100 text-rose-700'}`}>{value ? 'True' : 'False'}</span>,
+                    render: value => <span
+                        className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ${value ? 'bg-blue-100 text-blue-700' : 'bg-rose-100 text-rose-700'}`}>{value ? 'True' : 'False'}</span>,
                 },
                 {
                     title: 'Image',
@@ -137,17 +137,20 @@ export default function Home() {
                 {
                     title: 'Action',
                     key: 'action',
-                    render: (_,record)=>{
-                        return <Dropdown trigger={['click']} menu={{items: [
+                    render: (_, record) => {
+                        return <Dropdown trigger={['click']} menu={{
+                            items: [
                                 {
                                     key: 'delete',
                                     label: 'Delete',
-                                    icon: <DeleteOutlined />,
-                                    onClick: ()=>handleDelete(record.id),
+                                    icon: <DeleteOutlined/>,
+                                    onClick: () => handleDelete(record.id),
                                     danger: true
                                 }
-                            ]}} placement="bottomRight" arrow={{ pointAtCenter: true }}>
-                            <span className={'inline-flex w-8 h-8 items-center justify-center cursor-pointer'}><EllipsisOutlined /></span>
+                            ]
+                        }} placement="bottomRight" arrow={{pointAtCenter: true}}>
+                            <span
+                                className={'inline-flex w-8 h-8 items-center justify-center cursor-pointer'}><EllipsisOutlined/></span>
                         </Dropdown>
                     }
                 }
@@ -163,9 +166,10 @@ export default function Home() {
                 <Form onFinish={onFinish} form={form} labelCol={{span: 6}}
                       wrapperCol={{span: 18}}>
                     <Form.Item hidden={true} name='id' initialValue={uuidv4()}>
-                        <Input />
+                        <Input/>
                     </Form.Item>
-                    <Form.Item rules={[{required: true, message: 'This field is required'}]} label={'Pair'} name={'pair'}>
+                    <Form.Item rules={[{required: true, message: 'This field is required'}]} label={'Pair'}
+                               name={'pair'}>
                         <Select
                             options={values(PAIR_ENUM).map(item => ({
                                 label: <span
@@ -175,7 +179,8 @@ export default function Home() {
                             }))}
                         />
                     </Form.Item>
-                    <Form.Item rules={[{required: true, message: 'This field is required'}]} label={'Order'} name={'order'}>
+                    <Form.Item rules={[{required: true, message: 'This field is required'}]} label={'Order'}
+                               name={'order'}>
                         <Select options={values(ORDER_ENUM).map(item => ({
                             label: <span
                                 className={`items-center inline-flex  rounded-md px-2 py-1 text-xs font-medium ${orderColor[item as ORDER_ENUM]}`}
@@ -183,15 +188,26 @@ export default function Home() {
                             value: item
                         }))}/>
                     </Form.Item>
-                    <Form.Item rules={[{required: true, message: 'This field is required'}]} label={'Date'} name={'date'}>
-                        <DatePicker showTime={{ format: 'HH:mm' }}
+                    <Form.Item rules={[{required: true, message: 'This field is required'}]} label={'Date'}
+                               name={'date'}>
+                        <DatePicker showTime={{format: 'HH:mm'}}
                                     format="YYYY/MM/DD HH:mm" className={'w-full'}/>
                     </Form.Item>
-                    <Form.Item rules={[{required: true, message: 'This field is required'}]} label={'Take Profit'} name={'tp'}>
+                    <Form.Item rules={[{required: true, message: 'This field is required'}]} label={'Take Profit'}
+                               name={'tp'}>
                         <InputNumber className={'!w-full'}/>
                     </Form.Item>
-                    <Form.Item rules={[{required: true, message: 'This field is required'}]} label={'Rule'} name={'rule'}>
-                        <Select options={[{label: <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium bg-blue-100 text-blue-700`}>True</span>, value: true}, {label: <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium bg-rose-100 text-rose-700`}>False</span>, value: false}]}/>
+                    <Form.Item rules={[{required: true, message: 'This field is required'}]} label={'Rule'}
+                               name={'rule'}>
+                        <Select options={[{
+                            label: <span
+                                className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium bg-blue-100 text-blue-700`}>True</span>,
+                            value: true
+                        }, {
+                            label: <span
+                                className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium bg-rose-100 text-rose-700`}>False</span>,
+                            value: false
+                        }]}/>
                     </Form.Item>
                     <Form.Item label={'Image'} name={'img'}>
                         <Input/>
@@ -201,7 +217,8 @@ export default function Home() {
         </main>
     ) : (
         <div className={'w-full h-full flex items-center justify-center'}>
-        <span className="w-8 h-8 inline-block border-4 border-dashed rounded-full animate-spin-slow dark:border-violet-400"></span>
+            <span
+                className="w-8 h-8 inline-block border-4 border-dashed rounded-full animate-spin-slow dark:border-violet-400"></span>
         </div>
     )
 }
