@@ -1,3 +1,4 @@
+"use client";
 import { forwardRef, useImperativeHandle, useState } from "react";
 import { DatePicker, Form, Input, InputNumber, Modal, Select } from "antd";
 import { v4 as uuidv4 } from "uuid";
