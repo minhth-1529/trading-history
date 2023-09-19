@@ -1,6 +1,6 @@
 'use client'
-import {Button, DatePicker, Dropdown, Form, Image, Input, InputNumber, Modal, Select, Table} from "antd";
-import {assign, get, upperCase, values} from "lodash";
+import {Button, DatePicker, Dropdown, Form, Image, Input, InputNumber, message, Modal, Select, Table} from "antd";
+import {assign, get, isEmpty, upperCase, values} from "lodash";
 import {ORDER_ENUM, orderColor, PAIR_ENUM} from "@/module/constants";
 import {useEffect, useState} from "react";
 import {v4 as uuidv4} from 'uuid';
@@ -37,7 +37,7 @@ const fetchData = async () =>{
 const updateData = async (data: DataType[]) =>{
     await axios.put(`https://api.jsonbin.io/v3/b/${ID}`, data, {
         headers
-    }).then(res=>console.log(res))
+    }).then(res=>console.log(res)).catch(err=>console.log(err))
 }
 
 const handleUpdate = (data: DataType[]) =>{
@@ -60,8 +60,15 @@ export default function Home() {
 
     const handleDelete = (id: string)=>{
         const value = data.filter(item=>item.id !== id)
+
+        if (isEmpty(value)){
+            return message.error('Can not delete the last one!').then()
+        }
+
+
         setData(value)
         handleUpdate(value)
+        
     }
 
     const afterClose = () => {
