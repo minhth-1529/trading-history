@@ -165,4 +165,6 @@ const AddNewModal = forwardRef<TAddNewRef, IProps>(({ onFinish }, ref) => {
   );
 });
 
+AddNewModal.displayName = "AddNewModal";
+
 export default AddNewModal;
