@@ -1,15 +1,14 @@
 'use client'
 import {Button, DatePicker, Form, Image, Input, InputNumber, Modal, Select, Table} from "antd";
 import {ColumnsType} from "antd/es/table";
-import {assign, upperCase, values} from "lodash";
+import {assign, upperCase, values, get} from "lodash";
 import {ORDER_ENUM, orderColor, PAIR_ENUM} from "@/module/constants";
 import {useEffect, useState} from "react";
 import {v4 as uuidv4} from 'uuid';
 import dayjs from "dayjs";
 import cls from 'classnames'
-import {useLocalStorage} from 'react-use';
 import stringToHexColor from "@/app/util/stringToHexColor";
-import * as fs from 'fs';
+import axios from 'axios'
 
 interface DataType {
     id: string;
@@ -20,7 +19,6 @@ interface DataType {
     rule: boolean,
     img: string,
 }
-
 
 const columns: ColumnsType<DataType> = [
     {
@@ -72,32 +70,45 @@ const columns: ColumnsType<DataType> = [
     }
 ];
 
+const ID = "650979ed205af66dd4a181ec"
+const MASTER_KEY = "$2a$10$Rd9ABgmUvpzCCwSfjzxR6ukTEBj4b/bJZGs6ctH71iQIuD.ab9HUa"
+const ACCESS_KEY = '$2a$10$JKp2TKlikrln7C6stCJ4d.OdA0EiPUOP.JgLng2KzwBtXGw0X7BLq'
+
+const headers = {
+    "Content-Type": "application/json",
+    "X-Master-Key": MASTER_KEY,
+    "X-ACCESS-KEY": ACCESS_KEY
+}
+
+const fetchData = async () =>{
+    return axios.get(`https://api.jsonbin.io/v3/b/${ID}`, {headers})
+}
+
+const updateData = async (data: DataType[]) =>{
+    await axios.put(`https://api.jsonbin.io/v3/b/${ID}`, data, {
+        headers
+    }).then(res=>console.log(res))
+}
+
 export default function Home() {
     const [form] = Form.useForm<DataType>();
     const [open, setOpen] = useState<boolean>(false)
-    const [value, setValue] = useLocalStorage<string>('data', '')
     const [data, setData] = useState<DataType[]>([])
 
 
     const onFinish =  (value: DataType) => {
         const values = [assign(value, {date: dayjs(value.date).format()}),...data]
         setData(values)
-        fs.writeFile(`data.json`, JSON.stringify(values), function (err) {
-            if (err) {
-                return console.log(err);
-            }
 
-            console.log(`roles.constant.ts was downloaded and generated!`);
-        });
-        setValue(JSON.stringify(values))
+        updateData(values).then()
         setOpen(false)
     }
 
     useEffect(() => {
-        if (value) {
-            setData(JSON.parse(value))
-        }
-    }, [value]);
+        fetchData().then(res=> {
+            setData(get(res,'data.record',[]))
+        });
+    }, []);
 
 
     const afterClose = () => {
