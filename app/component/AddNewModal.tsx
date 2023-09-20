@@ -116,7 +116,7 @@ const AddNewModal = forwardRef<TAddNewRef, IProps>(({ onFinish }, ref) => {
         >
           <DatePicker
             showTime={{ format: "HH:mm" }}
-            format="YYYY/MM/DD HH:mm"
+            format="DD/MM/YYYY HH:mm"
             className={"w-full"}
           />
         </Form.Item>
@@ -159,6 +159,9 @@ const AddNewModal = forwardRef<TAddNewRef, IProps>(({ onFinish }, ref) => {
         </Form.Item>
         <Form.Item label={"Image"} name={"img"}>
           <Input />
+        </Form.Item>
+        <Form.Item label={"Note"} name={"note"}>
+          <Input.TextArea rows={4} />
         </Form.Item>
       </Form>
     </Modal>

@@ -9,4 +9,5 @@ export interface IDataType {
   tp: number;
   rule: boolean;
   img: string;
+  note: string;
 }

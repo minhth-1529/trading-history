@@ -98,7 +98,7 @@ export default function Home() {
             title: "Pair",
             dataIndex: "pair",
             key: "pair",
-            width: 150,
+            width: 100,
             render: (value) => (
               <span
                 className={
@@ -129,12 +129,14 @@ export default function Home() {
             title: "Date",
             dataIndex: "date",
             key: "date",
+            width: 150,
             render: (value) => dayjs(value).format("DD/MM/YYYY HH:mm"),
           },
           {
             title: "TP",
             dataIndex: "tp",
             key: "tp",
+            width: 100,
             render: (value) => (
               <span
                 className={cls(
@@ -151,6 +153,7 @@ export default function Home() {
             title: "Rule",
             dataIndex: "rule",
             key: "rule",
+            width: 100,
             render: (value) => (
               <span
                 className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ${
@@ -167,12 +170,26 @@ export default function Home() {
             title: "Image",
             dataIndex: "img",
             key: "image",
+            width: 100,
             render: (value) =>
-              value ? <Image width={100} preview={true} src={value} /> : null,
+              value ? (
+                <Image height={100} width={100} preview={true} src={value} />
+              ) : null,
+          },
+          {
+            title: "Note",
+            dataIndex: "note",
+            key: "note",
+            width: 250,
+            render: (value) =>
+              value ? (
+                <div className={"whitespace-pre-line"}>{value}</div>
+              ) : null,
           },
           {
             title: "Action",
             key: "action",
+            width: 80,
             render: (_, record) => {
               return (
                 <Dropdown

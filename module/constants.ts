@@ -2,6 +2,7 @@ export enum PAIR_ENUM {
   "EUR/USD" = "eur/usd",
   "USD/CHF" = "usd/chf",
   "EUR/JPY" = "eur/jpy",
+  "XAU/USD" = "xau/usd",
 }
 
 export enum ORDER_ENUM {
