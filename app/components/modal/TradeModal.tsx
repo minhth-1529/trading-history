@@ -4,9 +4,9 @@ import { DatePicker, Form, Input, InputNumber, Modal, Select } from "antd";
 import { v4 as uuidv4 } from "uuid";
 import { assign, upperCase, values } from "lodash";
 import { ORDER_ENUM, orderColor, PAIR_ENUM } from "@/module/constants";
-import stringToHexColor from "@/app/util/stringToHexColor";
 import { IDataType } from "@/module/interface";
 import dayjs from "dayjs";
+import stringToHexColor from "@/app/lib/stringToHexColor";
 
 export type TAddNewRef = {
   addNew: () => void;
@@ -17,7 +17,7 @@ interface IProps {
   onFinish: (value: IDataType) => void;
 }
 
-const AddNewModal = forwardRef<TAddNewRef, IProps>(({ onFinish }, ref) => {
+const TradeModal = forwardRef<TAddNewRef, IProps>(({ onFinish }, ref) => {
   const [formRef] = Form.useForm<IDataType>();
   const [open, setOpen] = useState<boolean>(false);
 
@@ -168,6 +168,6 @@ const AddNewModal = forwardRef<TAddNewRef, IProps>(({ onFinish }, ref) => {
   );
 });
 
-AddNewModal.displayName = "AddNewModal";
+TradeModal.displayName = "AddNewModal";
 
-export default AddNewModal;
+export default TradeModal;

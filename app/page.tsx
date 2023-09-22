@@ -1,239 +1,185 @@
 "use client";
-import { Button, Dropdown, Image, message, Table } from "antd";
-import { assign, get, isEmpty, unionBy, upperCase } from "lodash";
-import { ORDER_ENUM, orderColor } from "@/module/constants";
+import { Button, Form, Input, message, Tabs } from "antd";
+import { assign, get, isEmpty, unionBy } from "lodash";
 import { useEffect, useRef, useState } from "react";
 import dayjs from "dayjs";
-import cls from "classnames";
-import stringToHexColor from "@/app/util/stringToHexColor";
+import { ICondition, IDataType, TOriginDataType } from "@/module/interface";
+import TradeModal, { TAddNewRef } from "@/app/components/modal/TradeModal";
+import PatternModal, {
+  TPatternModal,
+} from "@/app/components/modal/PatternModal";
+import beforeUpdateData from "@/app/lib/beforeUpdateData";
+import { fetchData, handleData } from "@/app/lib/axiosData";
+import { fetchTabs, handleTabs } from "@/app/lib/axiosTabs";
+import LoadingComponent from "@/app/components/Loading";
+import TableComponent from "@/app/components/Table";
 import axios from "axios";
-import {
-  DeleteOutlined,
-  EditOutlined,
-  EllipsisOutlined,
-} from "@ant-design/icons";
-import { IDataType } from "@/module/interface";
-import AddNewModal, { TAddNewRef } from "@/app/component/AddNewModal";
 
-const ID = "650979ed205af66dd4a181ec";
-const MASTER_KEY =
-  "$2a$10$Rd9ABgmUvpzCCwSfjzxR6ukTEBj4b/bJZGs6ctH71iQIuD.ab9HUa";
-const ACCESS_KEY =
-  "$2a$10$JKp2TKlikrln7C6stCJ4d.OdA0EiPUOP.JgLng2KzwBtXGw0X7BLq";
-
-const headers = {
-  "Content-Type": "application/json",
-  "X-Master-Key": MASTER_KEY,
-  "X-ACCESS-KEY": ACCESS_KEY,
-};
-
-const fetchData = async () => {
-  return axios.get(`https://api.jsonbin.io/v3/b/${ID}`, { headers });
-};
-
-const updateData = async (data: IDataType[]) => {
-  await axios
-    .put(`https://api.jsonbin.io/v3/b/${ID}`, data, {
-      headers,
-    })
-    .then(() => message.success("Added/Deleted successfully!"))
-    .catch((err) => console.log(err));
-};
-
-const handleUpdate = (data: IDataType[]) => {
-  updateData(data).then();
-};
-
-export default function Home() {
-  const modalRef = useRef<TAddNewRef>(null);
+export default function RootPage() {
+  const tradeModalRef = useRef<TAddNewRef>(null);
+  const patternModalRef = useRef<TPatternModal>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const [data, setData] = useState<IDataType[]>([]);
+  const [formRef] = Form.useForm<ICondition>();
+  // ---------- data ----------
+  const [originData, setOriginData] = useState<TOriginDataType>({});
+  // const [data, setData] = useState<IDataType[]>([]);
 
-  const onFinish = (value: IDataType) => {
+  // ---------- tabs ----------
+  const [tabsData, setTabsData] = useState<string[]>([]);
+  const [activeTab, setActiveTab] = useState<string>("123BO");
+
+  // ---------- code ----------
+  const updateLayout = (originValues: TOriginDataType) => {
+    setOriginData(originValues);
+    handleData(originValues);
+  };
+
+  const onFinishTradeModal = (value: IDataType) => {
     const values = unionBy(
       [assign(value, { date: dayjs(value.date).format() })],
-      data,
+      originData[activeTab].data,
       "id",
     );
 
-    setData(values);
-    handleUpdate(values);
+    const originValues = beforeUpdateData(activeTab, originData, values);
+
+    updateLayout(originValues);
   };
 
-  const handleDelete = (id: string) => {
-    const value = data.filter((item) => item.id !== id);
+  const onFinishPatternModal = (value: string) => {
+    const values = [...tabsData, value];
+
+    const data = {
+      ...originData,
+      [value]: {
+        condition: "",
+        data: [],
+      },
+    };
+    setTabsData(values);
+    handleData(data);
+    setOriginData((prev) => ({
+      ...prev,
+      ...data,
+    }));
+
+    handleTabs(values);
+  };
+
+  const onDelete = (id: string) => {
+    const value = originData[activeTab].data.filter((item) => item.id !== id);
 
     if (isEmpty(value)) {
       return message.error("Can not delete the last one!").then();
     }
 
-    setData(value);
-    handleUpdate(value);
+    updateLayout(beforeUpdateData(activeTab, originData));
   };
 
-  const handleEdit = (record: IDataType) => {
-    if (modalRef.current) modalRef.current.edit(record);
+  const onEdit = (record: IDataType) => {
+    if (tradeModalRef.current) tradeModalRef.current.edit(record);
+  };
+
+  const onAddCondition = (value: any) => {
+    formRef.setFieldValue("condition", value.condition);
+    setOriginData(
+      beforeUpdateData(activeTab, originData, undefined, value.condition),
+    );
+    handleData(
+      beforeUpdateData(activeTab, originData, undefined, value.condition),
+    );
   };
 
   useEffect(() => {
-    fetchData().then((res) => {
-      setData(get(res, "data.record", []));
-      setLoading(false);
-    });
-  }, []);
+    if (loading) {
+      axios.all([fetchData(), fetchTabs()]).then(
+        axios.spread((data, tabData) => {
+          const originData = get(data, "data.record", {});
+          const tabsData = get(tabData, "data.record", []);
+
+          setOriginData(originData);
+          setTabsData(tabsData);
+
+          setActiveTab(tabsData.at(0));
+          formRef.setFieldValue(
+            "condition",
+            originData[tabsData.at(0)].condition,
+          );
+          setLoading(false);
+        }),
+      );
+    }
+  }, [loading]);
+
+  // useEffect(() => {
+  //   if (!loading) {
+  //     setData(originData[activeTab].data);
+  //
+  //     if (conditionRef.current) {
+  //       conditionRef.current.value = originData[activeTab].condition;
+  //     }
+  //   }
+  // }, [loading]);
 
   return !loading ? (
-    <main className="p-5">
-      <div className={"flex justify-end mb-5"}>
+    <main className="relative mx-auto max-w-screen-xl px-4 py-10  md:py-10">
+      <section className={"flex justify-end mb-5"}>
         <Button
-          onClick={() => modalRef.current && modalRef.current.addNew()}
+          type={"dashed"}
+          onClick={() =>
+            patternModalRef.current && patternModalRef.current.addNew()
+          }
+        >
+          Add Pattern
+        </Button>
+        <Button
+          onClick={() =>
+            tradeModalRef.current && tradeModalRef.current.addNew()
+          }
           type={"primary"}
         >
           Add
         </Button>
-      </div>
-      <Table
-        columns={[
-          {
-            title: "Pair",
-            dataIndex: "pair",
-            key: "pair",
-            width: 100,
-            render: (value) => (
-              <span
-                className={
-                  "inline-flex items-center rounded-md  px-2 py-1 text-xs font-medium text-white"
-                }
-                style={{ backgroundColor: stringToHexColor(value) as string }}
-              >
-                {value.toLocaleUpperCase()}
-              </span>
-            ),
-          },
-          {
-            title: "Order",
-            dataIndex: "order",
-            key: "order",
-            width: 150,
-            render: (value) => (
-              <span
-                className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium  ${
-                  orderColor[value as ORDER_ENUM]
-                }`}
-              >
-                {upperCase(value)}
-              </span>
-            ),
-          },
-          {
-            title: "Date",
-            dataIndex: "date",
-            key: "date",
-            width: 150,
-            render: (value) => dayjs(value).format("DD/MM/YYYY HH:mm"),
-          },
-          {
-            title: "TP",
-            dataIndex: "tp",
-            key: "tp",
-            width: 100,
-            render: (value) => (
-              <span
-                className={cls(
-                  "inline-flex items-center rounded-md  px-2 py-1 text-xs font-medium",
-                  { "bg-green-100 text-green-700": value > 0 },
-                  { "bg-red-100 text-red-700": value < 0 },
-                )}
-              >
-                {value}
-              </span>
-            ),
-          },
-          {
-            title: "Rule",
-            dataIndex: "rule",
-            key: "rule",
-            width: 100,
-            render: (value) => (
-              <span
-                className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ${
-                  value
-                    ? "bg-blue-100 text-blue-700"
-                    : "bg-rose-100 text-rose-700"
-                }`}
-              >
-                {value ? "True" : "False"}
-              </span>
-            ),
-          },
-          {
-            title: "Image",
-            dataIndex: "img",
-            key: "image",
-            width: 100,
-            render: (value) =>
-              value ? (
-                <Image height={100} width={100} preview={true} src={value} />
-              ) : null,
-          },
-          {
-            title: "Note",
-            dataIndex: "note",
-            key: "note",
-            width: 250,
-            render: (value) =>
-              value ? (
-                <div className={"whitespace-pre-line"}>{value}</div>
-              ) : null,
-          },
-          {
-            title: "Action",
-            key: "action",
-            width: 80,
-            render: (_, record) => {
-              return (
-                <Dropdown
-                  trigger={["click"]}
-                  menu={{
-                    items: [
-                      {
-                        key: "edit",
-                        label: "Edit",
-                        icon: <EditOutlined />,
-                        onClick: () => handleEdit(record),
-                      },
-                      {
-                        key: "delete",
-                        label: "Delete",
-                        icon: <DeleteOutlined />,
-                        onClick: () => handleDelete(record.id),
-                        danger: true,
-                      },
-                    ],
-                  }}
-                  placement="bottomRight"
-                  arrow={{ pointAtCenter: true }}
-                >
-                  <span
-                    className={
-                      "inline-flex w-8 h-8 items-center justify-center cursor-pointer"
-                    }
-                  >
-                    <EllipsisOutlined />
-                  </span>
-                </Dropdown>
-              );
-            },
-          },
-        ]}
-        rowKey={"id"}
-        dataSource={data}
-      />
-      <AddNewModal ref={modalRef} onFinish={onFinish} />
+      </section>
+      <section>
+        <Form form={formRef} onFinish={onAddCondition}>
+          <Form.Item name={"condition"}>
+            <Input.TextArea
+              autoSize
+              rows={4}
+              placeholder="Borderless"
+              bordered={true}
+              onBlur={formRef.submit}
+            />
+          </Form.Item>
+        </Form>
+      </section>
+      <section className={"w-full"}>
+        <div>
+          <Tabs
+            type="editable-card"
+            defaultActiveKey={activeTab}
+            accessKey={activeTab}
+            onChange={(value) => {
+              setActiveTab(value);
+              formRef.setFieldValue("condition", originData[value].condition);
+            }}
+            //tabPosition={"left"}
+            items={tabsData.map((item) => ({ label: item, key: item }))}
+          />
+        </div>
+        <div className={"w-full"}>
+          <TableComponent
+            onEdit={onEdit}
+            onDelete={onDelete}
+            data={originData[activeTab].data}
+          />
+        </div>
+      </section>
+      <PatternModal ref={patternModalRef} onFinish={onFinishPatternModal} />
+      <TradeModal ref={tradeModalRef} onFinish={onFinishTradeModal} />
     </main>
   ) : (
-    <div className={"w-full h-full flex items-center justify-center"}>
-      <span className="w-8 h-8 inline-block border-4 border-dashed rounded-full animate-spin-slow dark:border-violet-400"></span>
-    </div>
+    <LoadingComponent />
   );
 }

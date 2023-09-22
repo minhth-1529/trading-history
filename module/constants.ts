@@ -1,3 +1,14 @@
+const MASTER_KEY =
+  "$2a$10$Rd9ABgmUvpzCCwSfjzxR6ukTEBj4b/bJZGs6ctH71iQIuD.ab9HUa";
+const ACCESS_KEY =
+  "$2a$10$JKp2TKlikrln7C6stCJ4d.OdA0EiPUOP.JgLng2KzwBtXGw0X7BLq";
+
+export const headers = {
+  "Content-Type": "application/json",
+  "X-Master-Key": MASTER_KEY,
+  "X-ACCESS-KEY": ACCESS_KEY,
+};
+
 export enum PAIR_ENUM {
   "EUR/USD" = "eur/usd",
   "USD/CHF" = "usd/chf",
