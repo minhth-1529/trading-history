@@ -1,12 +1,31 @@
-import { ORDER_ENUM, PAIR_ENUM } from "@/module/constants";
-import { Dayjs } from "dayjs";
+import { Dayjs } from 'dayjs';
 
 export type TOriginDataType = {
   [key: string]: {
-    data: IDataType[];
+    [SUMMARY_ENUM.STATISTICAL]: IDataType[];
+    [SUMMARY_ENUM.BACK_TEST]: IDataType[];
     condition: string;
   };
 };
+
+export enum SUMMARY_ENUM {
+  STATISTICAL = 'statistical',
+  BACK_TEST = 'backTest'
+}
+
+export enum PAIR_ENUM {
+  'EUR/USD' = 'eur/usd',
+  'USD/CHF' = 'usd/chf',
+  'EUR/JPY' = 'eur/jpy',
+  'XAU/USD' = 'xau/usd'
+}
+
+export enum ORDER_ENUM {
+  'SELL' = 'sell',
+  'BUY' = 'buy',
+  'SELL_LIMIT' = 'sell_limit',
+  'BUY_LIMIT' = 'buy_limit'
+}
 
 export interface IDataType {
   id: string;
@@ -25,10 +44,4 @@ export interface IPattern {
 
 export interface ICondition {
   condition: string;
-}
-
-export interface ITabsKey {
-  label: string;
-  key: string;
-  //children: ReactNode
 }

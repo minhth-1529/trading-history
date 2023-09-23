@@ -1,5 +1,5 @@
-import stringToHexColor from "@/app/lib/stringToHexColor";
-import { ORDER_ENUM, orderColor } from "@/module/constants";
+import stringToHexColor from "@/lib/stringToHexColor";
+import { orderColor } from "@/module/constants";
 import { upperCase } from "lodash";
 import dayjs from "dayjs";
 import cls from "classnames";
@@ -9,7 +9,7 @@ import {
   EditOutlined,
   EllipsisOutlined,
 } from "@ant-design/icons";
-import { IDataType } from "@/module/interface";
+import { IDataType, ORDER_ENUM } from "@/module/interface";
 
 interface IProps {
   data: IDataType[];

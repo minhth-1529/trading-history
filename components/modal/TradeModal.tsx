@@ -3,10 +3,10 @@ import { forwardRef, useImperativeHandle, useState } from "react";
 import { DatePicker, Form, Input, InputNumber, Modal, Select } from "antd";
 import { v4 as uuidv4 } from "uuid";
 import { assign, upperCase, values } from "lodash";
-import { ORDER_ENUM, orderColor, PAIR_ENUM } from "@/module/constants";
-import { IDataType } from "@/module/interface";
+import { orderColor } from "@/module/constants";
+import { IDataType, ORDER_ENUM, PAIR_ENUM } from "@/module/interface";
 import dayjs from "dayjs";
-import stringToHexColor from "@/app/lib/stringToHexColor";
+import stringToHexColor from "@/lib/stringToHexColor";
 
 export type TAddNewRef = {
   addNew: () => void;
