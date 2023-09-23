@@ -1,6 +1,6 @@
-import React, { forwardRef, useImperativeHandle, useState } from "react";
-import { Form, Input, Modal } from "antd";
-import { IPattern } from "@/module/interface";
+import React, { forwardRef, useImperativeHandle, useState } from 'react';
+import { Form, Input, Modal } from 'antd';
+import { IPattern } from '@/module/interface';
 
 export type TPatternModal = {
   addNew: () => void;
@@ -56,5 +56,7 @@ const PatternModal = forwardRef<TPatternModal, IProps>(({ onFinish }, ref) => {
     </Modal>
   );
 });
+
+PatternModal.displayName = 'PatternModal'
 
 export default PatternModal;

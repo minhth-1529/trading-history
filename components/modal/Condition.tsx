@@ -1,6 +1,6 @@
-import React, { forwardRef, useImperativeHandle, useState } from "react";
-import { Form, Input, Modal } from "antd";
-import { ICondition } from "@/module/interface";
+import React, { forwardRef, useImperativeHandle, useState } from 'react';
+import { Form, Input, Modal } from 'antd';
+import { ICondition } from '@/module/interface';
 
 interface IProps {
   onFinish: (value: string) => void;
@@ -58,5 +58,7 @@ const ConditionModal = forwardRef<TConditionModal, IProps>(
     );
   },
 );
+
+ConditionModal.displayName = 'ConditionModal'
 
 export default ConditionModal;
