@@ -1,12 +1,12 @@
-"use client";
-import { forwardRef, useImperativeHandle, useState } from "react";
-import { DatePicker, Form, Input, InputNumber, Modal, Select } from "antd";
-import { v4 as uuidv4 } from "uuid";
-import { assign, upperCase, values } from "lodash";
-import { orderColor } from "@/module/constants";
-import { IDataType, ORDER_ENUM, PAIR_ENUM } from "@/module/interface";
-import dayjs from "dayjs";
-import stringToHexColor from "@/lib/stringToHexColor";
+'use client';
+import { forwardRef, useImperativeHandle, useState } from 'react';
+import { DatePicker, Form, Input, InputNumber, Modal, Select } from 'antd';
+import { v4 as uuidv4 } from 'uuid';
+import { assign, upperCase, values } from 'lodash';
+import { orderColor } from '@/module/constants';
+import { IDataType, ORDER_ENUM, PAIR_ENUM } from '@/module/interface';
+import dayjs from 'dayjs';
+import stringToHexColor from '@/lib/stringToHexColor';
 
 export type TAddNewRef = {
   addNew: () => void;
@@ -17,12 +17,23 @@ interface IProps {
   onFinish: (value: IDataType) => void;
 }
 
-const TradeModal = forwardRef<TAddNewRef, IProps>(({ onFinish }, ref) => {
+const EntryModal = forwardRef<TAddNewRef, IProps>(({ onFinish }, ref) => {
   const [formRef] = Form.useForm<IDataType>();
+  const [loading,setLoading] = useState<boolean>(false)
   const [open, setOpen] = useState<boolean>(false);
 
   const afterClose = () => {
     formRef.resetFields();
+  };
+
+  const handleFinish = (value: IDataType) => {
+    setLoading(true)
+
+    setTimeout(()=>{
+      setLoading(false)
+      onFinish(value);
+      setOpen(false);
+    },1000)
   };
 
   useImperativeHandle(ref, () => ({
@@ -42,20 +53,19 @@ const TradeModal = forwardRef<TAddNewRef, IProps>(({ onFinish }, ref) => {
     },
   }));
 
-  const handleFinish = (value: IDataType) => {
-    onFinish(value);
-    setOpen(false);
-  };
-
   return (
     <Modal
       forceRender
       destroyOnClose={true}
-      title={"Add New"}
+      title={"Entry"}
       open={open}
       onCancel={() => setOpen(false)}
       onOk={formRef.submit}
       afterClose={afterClose}
+      confirmLoading={loading}
+      okText={'Submit'}
+      okButtonProps={{size: 'small'}}
+      cancelButtonProps={{size: 'small'}}
     >
       <Form
         onFinish={handleFinish}
@@ -168,6 +178,6 @@ const TradeModal = forwardRef<TAddNewRef, IProps>(({ onFinish }, ref) => {
   );
 });
 
-TradeModal.displayName = "AddNewModal";
+EntryModal.displayName = "EntryModal";
 
-export default TradeModal;
+export default EntryModal;

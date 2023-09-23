@@ -12,6 +12,7 @@ interface IProps {
 
 const PatternModal = forwardRef<TPatternModal, IProps>(({ onFinish }, ref) => {
   const [formRef] = Form.useForm<IPattern>();
+  const [loading,setLoading] = useState<boolean>(false)
   const [open, setOpen] = useState<boolean>(false);
 
   const afterClose = () => {
@@ -19,8 +20,13 @@ const PatternModal = forwardRef<TPatternModal, IProps>(({ onFinish }, ref) => {
   };
 
   const handleFinish = (value: IPattern) => {
-    onFinish(value.name);
-    setOpen(false);
+    setLoading(true)
+
+    setTimeout(()=>{
+      setLoading(false)
+      onFinish(value.name);
+      setOpen(false);
+    },1000)
   };
 
   useImperativeHandle(ref, () => ({
@@ -33,11 +39,15 @@ const PatternModal = forwardRef<TPatternModal, IProps>(({ onFinish }, ref) => {
     <Modal
       forceRender
       destroyOnClose={true}
-      title={"Add New"}
+      title={"Pattern"}
       open={open}
       onCancel={() => setOpen(false)}
       onOk={formRef.submit}
       afterClose={afterClose}
+      confirmLoading={loading}
+      okButtonProps={{size: 'small'}}
+      cancelButtonProps={{size: 'small'}}
+      okText={'Submit'}
     >
       <Form
         onFinish={handleFinish}

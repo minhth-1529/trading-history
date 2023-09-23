@@ -1,7 +1,7 @@
 'use client';
 import React, { useEffect, useRef, useState } from 'react';
 import { fetchData, handlePutData } from '@/lib/axiosData';
-import TradeModal, { TAddNewRef } from '@/components/modal/TradeModal';
+import EntryModal, { TAddNewRef } from '@/components/modal/EntryModal';
 import PatternModal, { TPatternModal } from '@/components/modal/PatternModal';
 import { FloatButton, Form, Input, message, Tabs } from 'antd';
 import { ICondition, IDataType, SUMMARY_ENUM, TOriginDataType } from '@/module/interface';
@@ -82,7 +82,7 @@ export default function RootPage() {
 
   const removePattern = (targetKey: TargetKey) => {
     if (patternData.length === 1) {
-      return message.error('Can not delete the last one!');
+      return message.error('Can not delete the last one!').then();
     }
 
     let newActiveKey = activePattern;
@@ -206,7 +206,7 @@ export default function RootPage() {
         </div>
       </section>
       <PatternModal ref={patternModalRef} onFinish={onFinishPatternModal} />
-      <TradeModal ref={tradeModalRef} onFinish={onFinishTradeModal} />
+      <EntryModal ref={tradeModalRef} onFinish={onFinishTradeModal} />
     </main>
   ) : (
     <LoadingComponent />
