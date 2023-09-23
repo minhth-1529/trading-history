@@ -6,7 +6,7 @@ import enUS from "antd/locale/en_US";
 import dayjs from "dayjs";
 import "dayjs/locale/es-us";
 import { useServerInsertedHTML } from "next/navigation";
-import React, { PropsWithChildren, useState } from "react";
+import React, { PropsWithChildren, useEffect, useState } from "react";
 
 // suppress useLayoutEffect warnings when running outside a browser
 if (!process.browser) React.useLayoutEffect = React.useEffect;
@@ -14,6 +14,10 @@ if (!process.browser) React.useLayoutEffect = React.useEffect;
 dayjs.locale("es-us");
 
 export default function AntdProvider({ children }: PropsWithChildren) {
+  useEffect(() => {
+    document.title = "Trading History"
+  }, []);
+
   return (
     <ConfigProvider
       locale={enUS}
