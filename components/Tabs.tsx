@@ -1,5 +1,5 @@
-import React from "react";
-import { Tabs } from "antd";
+import React from 'react';
+import { Tabs } from 'antd';
 
 export type TargetKey = React.MouseEvent | React.KeyboardEvent | string;
 

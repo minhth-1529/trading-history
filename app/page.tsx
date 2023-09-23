@@ -81,6 +81,10 @@ export default function RootPage() {
   };
 
   const removePattern = (targetKey: TargetKey) => {
+    if (patternData.length === 1) {
+      return message.error('Can not delete the last one!');
+    }
+
     let newActiveKey = activePattern;
     let lastIndex = -1;
 
@@ -102,9 +106,7 @@ export default function RootPage() {
 
     const data = { ...originData };
 
-    console.log('targetKey', typeof targetKey);
     delete data[targetKey as string];
-    console.log('data', data);
 
     axiosPutData(data);
     axiosPutPattern(newTabsData);
@@ -186,6 +188,7 @@ export default function RootPage() {
       </section>
       <section className={'flex w-full'}>
         <Tabs
+          className={'pt-[50px]'}
           onChange={(value) => setActiveSummary(value as SUMMARY_ENUM)}
           tabPosition={'left'}
           items={values(SUMMARY_ENUM).map((item) => ({
