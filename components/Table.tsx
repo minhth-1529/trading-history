@@ -1,15 +1,11 @@
-import stringToHexColor from "@/lib/stringToHexColor";
-import { orderColor } from "@/module/constants";
-import { upperCase } from "lodash";
-import dayjs from "dayjs";
-import cls from "classnames";
-import { Dropdown, Image, Table } from "antd";
-import {
-  DeleteOutlined,
-  EditOutlined,
-  EllipsisOutlined,
-} from "@ant-design/icons";
-import { IDataType, ORDER_ENUM } from "@/module/interface";
+import stringToHexColor from '@/lib/stringToHexColor';
+import { orderColor } from '@/module/constants';
+import { upperCase } from 'lodash';
+import dayjs from 'dayjs';
+import cls from 'classnames';
+import { Dropdown, Image, Table } from 'antd';
+import { DeleteOutlined, EditOutlined, EllipsisOutlined } from '@ant-design/icons';
+import { IDataType, ORDER_ENUM } from '@/module/interface';
 
 interface IProps {
   data: IDataType[];
@@ -57,6 +53,10 @@ export default function TableComponent({ data, onEdit, onDelete }: IProps) {
           dataIndex: "date",
           key: "date",
           width: 150,
+          defaultSortOrder: 'descend',
+          sorter: (a, b) => {
+            return dayjs(a.date).isAfter(dayjs(b.date)) ? 1 : -1
+          },
           render: (value) => dayjs(value).format("DD/MM/YYYY HH:mm"),
         },
         {
@@ -64,6 +64,7 @@ export default function TableComponent({ data, onEdit, onDelete }: IProps) {
           dataIndex: "tp",
           key: "tp",
           width: 100,
+          sorter: (a, b) => a.tp - b.tp,
           render: (value) => (
             <span
               className={cls(
