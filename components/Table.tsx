@@ -16,6 +16,11 @@ interface IProps {
 export default function TableComponent({ data, onEdit, onDelete }: IProps) {
   return (
     <Table
+      pagination={{
+        size: 'small',
+        defaultPageSize: 20,
+        showTotal:(total, range) => `${range[0]}-${range[1]} of ${total} items`
+      }}
       columns={[
         {
           title: "Pair",
