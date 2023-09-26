@@ -60,9 +60,11 @@ jobs:
           response=$(curl -s -X POST \
             -H "Content-Type: application/json" \
             -H "Authorization: $LINEAR_API_TOKEN" \
-            -d "query" https://api.linear.app/graphql)errors=(echo "response"∣jq−r′.errors′)success=(echo "$response" | jq -r '.data.commentCreate.success')
+            -d "$query" \
+            https://api.linear.app/graphql)
           
           errors=$(echo "$response" | jq -r '.errors')
+          success=$(echo "$response" | jq -r '.data.commentCreate.success')
           
           if [ -n "$errors" ]; then
             echo "GraphQL errors: $errors"
