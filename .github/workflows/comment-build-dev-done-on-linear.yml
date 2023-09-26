@@ -44,15 +44,16 @@ jobs:
 
           echo "Assignee ID 1: $assignee_id"
           echo "Assignee Name 1: $assignee_display_name"
+          
+          echo "Assignee ID 1: $assignee_id"
+          echo "Assignee Name 1: $assignee_display_name"
+          echo "linear issue id: $LINEAR_ISSUE_ID"
 
           query='{"query": "mutation test { commentCreate(input: { issueId: \"'$LINEAR_ISSUE_ID'\", bodyData: { type: \"doc\", content: [ { type: \"paragraph\", content: [ { type: \"text\", text: \"Hi \" }, { type: \"suggestion_userMentions\", attrs: { id: \"'$assignee_id'\", label: \"'$assignee_display_name'\" } }, { type: \"text\", text: \" \" }, { type: \"text\", text: \"code built to Develop\" } ] } ] } ) { success } }"}'
           
           success=$(echo "$response" | jq -r '.data.commentCreate')
 
-          echo "success: $success"
-          echo "Assignee ID 1: $assignee_id"
-          echo "Assignee Name 1: $assignee_display_name"
-          echo "linear issue id: $LINEAR_ISSUE_ID"
+          
 
           headers='{"Content-Type": "application/json", "Authorization": "Bearer '$LINEAR_API_TOKEN'"}'
 
