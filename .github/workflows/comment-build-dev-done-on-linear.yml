@@ -49,46 +49,26 @@ jobs:
           echo "Assignee Name 1: $assignee_display_name"
           echo "linear issue id: $LINEAR_ISSUE_ID"
 
-          json_payload=$(cat <<EOF
-            {
-              "query": "mutation test {
-              commentCreate(input: {
-                issueId: \"$LINEAR_ISSUE_ID\",
-                bodyData: {
-                  type: \"doc\",
-                  content: [
-                    {
-                      type: \"paragraph\",
-                      content: [
-                        {
-                          type: \"text\",
-                          text: \"Hi \"
-                        },
-                        {
-                          type: \"suggestion_userMentions\",
-                          attrs: {
-                            id: \"$assignee_id\",
-                            label: \"$assignee_display_name\"
-                          }
-                        },
-                        {
-                          type: \"text\",
-                          text: \" code built to Develop\"
-                        }
-                      ]
-                    }
-                  ]
-                }
-              }) {
-                success
-              }
-            }"
-            }
-            EOF
-            )
+          query='{"query": "mutation test { commentCreate(input: { issueId: \"'$LINEAR_ISSUE_ID'\", bodyData: { type: \"doc\", content: [ { type: \"paragraph\", content: [ { type: \"text\", text: \"Hi \" }, { type: \"suggestion_userMentions\", attrs: { id: \"'$assignee_id'\", label: \"'$assignee_display_name'\" } }, { type: \"text\", text: \" \" }, { type: \"text\", text: \"code built to Develop\" } ] } ] } ) { success } }"}'
           
-          response=$(curl -s -X POST -H "Content-Type: application/json" -H "Authorization: Bearer $LINEAR_API_TOKEN" -d "$json_payload" https://api.linear.app/graphql)
+          headers='{"Content-Type": "application/json", "Authorization": "Bearer '$LINEAR_API_TOKEN'"}'
+
+          response=$(curl -s -X POST \
+            -H "Content-Type: application/json" \
+            -H "Authorization: $LINEAR_API_TOKEN" \
+            -d "$query" \
+            https://api.linear.app/graphql)
           
-          success=$(echo "$response" | jq -r '.data.commentCreate.success')
+          errors=$(echo "$response" | jq -r '.errors')
           
-          echo "Success: $success"
+          if [ -n "$errors" ]; then
+            echo "GraphQL errors: $errors"
+          else
+            success=$(echo "$response" | jq -r '.data.commentCreate.success')
+            
+            if [ "$success" == "true" ]; then
+              echo "Comment created successfully."
+            else
+              echo "Failed to create comment."
+            fi
+          fi
