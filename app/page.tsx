@@ -12,8 +12,8 @@ import PatternComponent, { TargetKey } from '@/components/Tabs';
 import axios from 'axios';
 import TableComponent from '@/components/Table';
 import { PlusOutlined } from '@ant-design/icons';
-import { produce } from 'immer';
 import LoadingComponent from '@/components/Loading';
+import { produce } from 'immer';
 
 export default function RootPage() {
   // ---------- ref ----------
