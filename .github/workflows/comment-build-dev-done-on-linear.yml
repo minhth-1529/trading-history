@@ -49,10 +49,14 @@ jobs:
           echo "Assignee Name 1: $assignee_display_name"
           echo "linear issue id: $LINEAR_ISSUE_ID"
 
-          json_payload=$(jq -n --arg issue_id "$LINEAR_ISSUE_ID" --arg assignee_id "$assignee_id" --arg assignee_display_name "$assignee_display_name" \'{ "query": "mutation test { commentCreate(input: { issueId: $issue_id, bodyData: { type: \"doc\", content: [ { type: \"paragraph\", content: [ { type: \"text\", text: \"Hi \" }, { type: \"suggestion_userMentions\", attrs: { id: $assignee_id, label: $assignee_display_name } }, { type: \"text\", text: \" \" }, { type: \"text\", text: \"code built to Develop\" } ] } ] } ) { success } }" }')
+          query='{"query": "mutation test { commentCreate(input: { issueId: \"'$LINEAR_ISSUE_ID'\", bodyData: { type: \"doc\", content: [ { type: \"paragraph\", content: [ { type: \"text\", text: \"Hi \" }, { type: \"suggestion_userMentions\", attrs: { id: \"'$assignee_id'\", label: \"'$assignee_display_name'\" } }, { type: \"text\", text: \" \" }, { type: \"text\", text: \"code built to Develop\" } ] } ] } ) { success } }"}'
           
           headers='{"Content-Type": "application/json", "Authorization": "Bearer '$LINEAR_API_TOKEN'"}'
 
-          response=$(curl -s -X POST -H "Content-Type: application/json" -H "Authorization: $LINEAR_API_TOKEN" -d "$json_payload" https://api.linear.app/graphql)
-
-          success=$(echo "$response" | jq -r '.data.commentCreate')
+          response=$(curl -s -X POST \
+            -H "Content-Type: application/json" \
+            -H "Authorization: $LINEAR_API_TOKEN" \
+            -d "$query" \
+            https://api.linear.app/graphql)
+          
+          success=$(echo "$response" | jq -r '.data.commentCreate.success')
