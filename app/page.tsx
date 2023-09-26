@@ -5,7 +5,7 @@ import EntryModal, { TAddNewRef } from '@/components/modal/EntryModal';
 import PatternModal, { TPatternModal } from '@/components/modal/PatternModal';
 import { FloatButton, Form, Input, message, Tabs } from 'antd';
 import { ICondition, IDataType, SUMMARY_ENUM, TOriginDataType } from '@/module/interface';
-import { assign, get, startCase, unionBy, values } from 'lodash';
+import { assign, get, startCase, sumBy, unionBy, values } from 'lodash';
 import dayjs from 'dayjs';
 import { fetchPattern, handlePutPattern } from '@/lib/axiosTabs';
 import PatternComponent, { TargetKey } from '@/components/Tabs';
@@ -199,6 +199,20 @@ export default function RootPage() {
         <div className={'w-full'}>
           <div>
             <PatternComponent data={patternData} activePattern={activePattern} onPatternChange={onTabChange} onPatternEdit={onTabEdit} />
+          </div>
+          <div className={'rounded-2 mb-5 bg-gray-100'}>
+            <div className={'mx-auto p-4'}>
+              <div>
+                <dl className="mb-0 grid grid-cols-1 gap-5 sm:grid-cols-3">
+                  <div className="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6">
+                    <dt className="truncate text-sm font-medium text-gray-500">Total</dt>
+                    <dd className="mb-0 mt-1 text-3xl font-semibold tracking-tight text-gray-900">
+                      {sumBy(originData[activePattern][activeSummary], 'tp')}
+                    </dd>
+                  </div>
+                </dl>
+              </div>
+            </div>
           </div>
           <div className={'w-full'}>
             <TableComponent onEdit={onTableEdit} onDelete={onTableDelete} data={originData[activePattern][activeSummary]} />
