@@ -66,5 +66,5 @@ jobs:
           errors=$(echo "$response" | jq -r '.errors')
           success=$(echo "$response" | jq -r '.data.commentCreate.success')
           
-          echo "Assignee ID 1: $errors"
-          echo "Assignee ID 1: $success"
+          echo "error: $errors"
+          echo "success: $success"
