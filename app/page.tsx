@@ -1,169 +1,214 @@
-'use client'
-import {Button, DatePicker, Form, Image, Input, InputNumber, Modal, Select, Table} from "antd";
-import {ColumnsType} from "antd/es/table";
-import {assign, upperCase, values, get} from "lodash";
-import {ORDER_ENUM, orderColor, PAIR_ENUM} from "@/module/constants";
-import {useEffect, useState} from "react";
-import {v4 as uuidv4} from 'uuid';
-import dayjs from "dayjs";
-import cls from 'classnames'
-import stringToHexColor from "@/app/util/stringToHexColor";
-import axios from 'axios'
+'use client';
+import React, { useEffect, useRef, useState } from 'react';
+import { fetchData, handlePutData } from '@/lib/axiosData';
+import EntryModal, { TAddNewRef } from '@/components/modal/EntryModal';
+import PatternModal, { TPatternModal } from '@/components/modal/PatternModal';
+import { FloatButton, Form, Input, message, Tabs } from 'antd';
+import { ICondition, IDataType, SUMMARY_ENUM, TOriginDataType } from '@/module/interface';
+import { assign, get, startCase, unionBy, values } from 'lodash';
+import dayjs from 'dayjs';
+import { fetchPattern, handlePutPattern } from '@/lib/axiosTabs';
+import PatternComponent, { TargetKey } from '@/components/Tabs';
+import axios from 'axios';
+import TableComponent from '@/components/Table';
+import { PlusOutlined } from '@ant-design/icons';
+import { produce } from 'immer';
+import LoadingComponent from '@/components/Loading';
 
-interface DataType {
-    id: string;
-    pair: PAIR_ENUM;
-    order: ORDER_ENUM;
-    date: string,
-    tp: number,
-    rule: boolean,
-    img: string,
-}
+export default function RootPage() {
+  // ---------- ref ----------
+  const tradeModalRef = useRef<TAddNewRef>(null);
+  const patternModalRef = useRef<TPatternModal>(null);
+  const [formRef] = Form.useForm<ICondition>();
 
-const columns: ColumnsType<DataType> = [
-    {
-        title: 'Pair',
-        dataIndex: 'pair',
-        key: 'pair',
-        width: 150,
-        render: (value) => <span
-            className={'inline-flex items-center rounded-md  px-2 py-1 text-xs font-medium text-white'}
-            style={{backgroundColor: stringToHexColor(value) as string}}>{value.toLocaleUpperCase()}</span>,
-    },
-    {
-        title: 'Order',
-        dataIndex: 'order',
-        key: 'order',
-        width: 150,
-        render: value => <span
-            className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium  ${orderColor[value as ORDER_ENUM]}`}
-        >{upperCase(value)}</span>
-    },
-    {
-        title: 'Date',
-        dataIndex: 'date',
-        key: 'date',
-        render: value => dayjs(value).format('DD/MM/YYYY HH:mm')
-    },
-    {
-        title: 'TP',
-        dataIndex: 'tp',
-        key: 'tp',
-        render: value => <span
-            className={cls('inline-flex items-center rounded-md  px-2 py-1 text-xs font-medium', {'bg-green-100 text-green-700': value > 0}, {'bg-red-100 text-red-700': value < 0})}>{value}</span>
-    },
-    {
-        title: 'Rule',
-        dataIndex: 'rule',
-        key: 'rule',
-        render: value => <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ${value ? 'bg-blue-100 text-blue-700' : 'bg-rose-100 text-rose-700'}`}>{value ? 'True' : 'False'}</span>,
-    },
-    {
-        title: 'Image',
-        dataIndex: 'img',
-        key: 'image',
-        render: value => value ? <Image
-            width={50}
-            preview={true}
-            src={value}
-        /> : null
-    }
-];
+  // ---------- state ----------
+  const [loading, setLoading] = useState<boolean>(true);
 
-const ID = "650979ed205af66dd4a181ec"
-const MASTER_KEY = "$2a$10$Rd9ABgmUvpzCCwSfjzxR6ukTEBj4b/bJZGs6ctH71iQIuD.ab9HUa"
-const ACCESS_KEY = '$2a$10$JKp2TKlikrln7C6stCJ4d.OdA0EiPUOP.JgLng2KzwBtXGw0X7BLq'
+  // ---------- data ----------
+  const [originData, setOriginData] = useState<TOriginDataType>({});
 
-const headers = {
-    "Content-Type": "application/json",
-    "X-Master-Key": MASTER_KEY,
-    "X-ACCESS-KEY": ACCESS_KEY
-}
+  // ---------- pattern ----------
+  const [patternData, setPatternData] = useState<string[]>([]);
+  const [activePattern, setActivePattern] = useState<string>('123BO');
 
-const fetchData = async () =>{
-    return axios.get(`https://api.jsonbin.io/v3/b/${ID}`, {headers})
-}
+  // ---------- summary ----------
+  const [activeSummary, setActiveSummary] = useState<SUMMARY_ENUM>(SUMMARY_ENUM.STATISTICAL);
 
-const updateData = async (data: DataType[]) =>{
-    await axios.put(`https://api.jsonbin.io/v3/b/${ID}`, data, {
-        headers
-    }).then(res=>console.log(res))
-}
+  // ---------- code ----------
 
-export default function Home() {
-    const [form] = Form.useForm<DataType>();
-    const [open, setOpen] = useState<boolean>(false)
-    const [data, setData] = useState<DataType[]>([])
+  const axiosPutData = (originData: TOriginDataType) => {
+    setOriginData(originData);
+    handlePutData(originData)
+      .then()
+      .catch((err) => console.log(err));
+  };
 
+  const axiosPutPattern = (value: string[]) => {
+    setPatternData(value);
+    handlePutPattern(value)
+      .then()
+      .catch((err) => console.log(err));
+  };
 
-    const onFinish =  (value: DataType) => {
-        const values = [assign(value, {date: dayjs(value.date).format()}),...data]
-        setData(values)
+  const onFinishTradeModal = (value: IDataType) => {
+    const values = unionBy([assign(value, { date: dayjs(value.date).format() })], originData[activePattern][activeSummary], 'id');
 
-        updateData(values).then()
-        setOpen(false)
+    const originValues = produce(originData, (draft) => {
+      draft[activePattern][activeSummary] = values;
+    });
+
+    axiosPutData(originValues);
+  };
+
+  const onFinishPatternModal = (value: string) => {
+    if (patternData.includes(value)) {
+      return message.error('Can not the some already Pattern').then();
     }
 
-    useEffect(() => {
-        fetchData().then(res=> {
-            setData(get(res,'data.record',[]))
-        });
-    }, []);
+    const values = [...patternData, value];
 
+    const data = {
+      ...originData,
+      [value]: {
+        condition: '',
+        [SUMMARY_ENUM.STATISTICAL]: [],
+        [SUMMARY_ENUM.BACK_TEST]: []
+      }
+    };
 
-    const afterClose = () => {
-        form.resetFields();
+    axiosPutData({ ...originData, ...data });
+    axiosPutPattern(values);
+  };
+
+  const removePattern = (targetKey: TargetKey) => {
+    if (patternData.length === 1) {
+      return message.error('Can not delete the last one!').then();
     }
 
-    return (
-        <main className="p-5">
-            <div className={'flex justify-end mb-5'}><Button onClick={() => setOpen(true)} type={'primary'}>Add</Button></div>
-            <Table columns={columns} rowKey={'id'} dataSource={data}/>
-            <Modal
-                title={'Add New'}
-                open={open}
-                onCancel={() => setOpen(false)}
-                onOk={form.submit}
-                afterClose={afterClose}
-            >
-                <Form onFinish={onFinish} form={form} labelCol={{span: 6}}
-                      wrapperCol={{span: 18}}>
-                    <Form.Item hidden={true} name='id' initialValue={uuidv4()}>
-                        <Input/>
-                    </Form.Item>
-                    <Form.Item rules={[{required: true, message: 'This field is required'}]} label={'Pair'} name={'pair'}>
-                        <Select
-                            options={values(PAIR_ENUM).map(item => ({
-                                label: <span
-                                    className={'items-center inline-flex rounded-md  px-2 py-1 text-xs font-medium text-white'}
-                                    style={{backgroundColor: stringToHexColor(item) as string}}>{item.toLocaleUpperCase()}</span>,
-                                value: item
-                            }))}
-                        />
-                    </Form.Item>
-                    <Form.Item rules={[{required: true, message: 'This field is required'}]} label={'Order'} name={'order'}>
-                        <Select options={values(ORDER_ENUM).map(item => ({
-                            label: <span
-                                className={`items-center inline-flex  rounded-md px-2 py-1 text-xs font-medium ${orderColor[item as ORDER_ENUM]}`}
-                            >{upperCase(item)}</span>,
-                            value: item
-                        }))}/>
-                    </Form.Item>
-                    <Form.Item rules={[{required: true, message: 'This field is required'}]} label={'Date'} name={'date'}>
-                        <DatePicker showTime={{ format: 'HH:mm' }}
-                                    format="YYYY/MM/DD HH:mm" className={'w-full'}/>
-                    </Form.Item>
-                    <Form.Item rules={[{required: true, message: 'This field is required'}]} label={'Take Profit'} name={'tp'}>
-                        <InputNumber className={'!w-full'}/>
-                    </Form.Item>
-                    <Form.Item rules={[{required: true, message: 'This field is required'}]} label={'Rule'} name={'rule'}>
-                        <Select options={[{label: <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium bg-blue-100 text-blue-700`}>True</span>, value: true}, {label: <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium bg-rose-100 text-rose-700`}>False</span>, value: false}]}/>
-                    </Form.Item>
-                    <Form.Item label={'Image'} name={'img'}>
-                        <Input/>
-                    </Form.Item>
-                </Form>
-            </Modal>
-        </main>
-    )
+    let newActiveKey = activePattern;
+    let lastIndex = -1;
+
+    patternData.forEach((item, i) => {
+      if (item === targetKey) {
+        lastIndex = i - 1;
+      }
+    });
+
+    const newTabsData = patternData.filter((item) => item !== targetKey);
+
+    if (newTabsData.length && newActiveKey === targetKey) {
+      if (lastIndex >= 0) {
+        newActiveKey = newTabsData[lastIndex];
+      } else {
+        newActiveKey = newTabsData[0];
+      }
+    }
+
+    const data = { ...originData };
+
+    delete data[targetKey as string];
+
+    axiosPutData(data);
+    axiosPutPattern(newTabsData);
+
+    setActivePattern(newActiveKey);
+    formRef.setFieldValue('condition', data[newActiveKey].condition);
+  };
+
+  const onTableDelete = (id: string) => {
+    const data = produce(originData, (draft) => {
+      draft[activePattern][activeSummary] = draft[activePattern][activeSummary].filter((item) => item.id !== id);
+    });
+
+    axiosPutData(data);
+  };
+
+  const onTableEdit = (record: IDataType) => {
+    if (tradeModalRef.current) tradeModalRef.current.edit(record);
+  };
+
+  const onAddCondition = (value: ICondition) => {
+    const { condition } = value;
+    formRef.setFieldValue('condition', condition);
+
+    const data = produce(originData, (draft) => {
+      draft[activePattern].condition = condition;
+    });
+
+    axiosPutData(data);
+  };
+
+  const onTabChange = (value: string) => {
+    setActivePattern(value);
+    formRef.setFieldValue('condition', originData[value].condition);
+  };
+
+  const onTabEdit = (targetKey: TargetKey, action: 'add' | 'remove') => {
+    if (action === 'add') {
+      patternModalRef.current && patternModalRef.current.addNew();
+    } else {
+      removePattern(targetKey);
+    }
+  };
+
+  // fetch data
+  useEffect(() => {
+    axios.all([fetchData(), fetchPattern()]).then(
+      axios.spread((data, tabData) => {
+        const originData = get(data, 'data.record', {});
+        const tabsData = get(tabData, 'data.record', []);
+
+        setOriginData(originData);
+        setPatternData(tabsData);
+
+        setActivePattern(tabsData.at(0));
+        formRef.setFieldValue('condition', originData[tabsData.at(0)].condition);
+
+        setLoading(false);
+      })
+    );
+  }, []);
+
+  return !loading ? (
+    <main className="relative mx-auto max-w-screen-xl px-4 py-10  md:py-10">
+      <section>
+        <FloatButton
+          onClick={() => tradeModalRef.current && tradeModalRef.current.addNew()}
+          icon={<PlusOutlined />}
+          type="primary"
+          style={{ right: 20, bottom: 20 }}
+        />
+      </section>
+      <section>
+        <Form form={formRef} onFinish={onAddCondition}>
+          <Form.Item name={'condition'}>
+            <Input.TextArea autoSize rows={4} placeholder="Enter Condition" bordered={true} onBlur={formRef.submit} />
+          </Form.Item>
+        </Form>
+      </section>
+      <section className={'flex w-full'}>
+        <Tabs
+          className={'pt-[50px]'}
+          onChange={(value) => setActiveSummary(value as SUMMARY_ENUM)}
+          tabPosition={'left'}
+          items={values(SUMMARY_ENUM).map((item) => ({
+            label: startCase(item),
+            key: item
+          }))}
+        />
+        <div className={'w-full'}>
+          <div>
+            <PatternComponent data={patternData} activePattern={activePattern} onPatternChange={onTabChange} onPatternEdit={onTabEdit} />
+          </div>
+          <div className={'w-full'}>
+            <TableComponent onEdit={onTableEdit} onDelete={onTableDelete} data={originData[activePattern][activeSummary]} />
+          </div>
+        </div>
+      </section>
+      <PatternModal ref={patternModalRef} onFinish={onFinishPatternModal} />
+      <EntryModal ref={tradeModalRef} onFinish={onFinishTradeModal} />
+    </main>
+  ) : (
+    <LoadingComponent />
+  );
 }
