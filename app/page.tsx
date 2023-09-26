@@ -10,10 +10,10 @@ import dayjs from 'dayjs';
 import { fetchPattern, handlePutPattern } from '@/lib/axiosTabs';
 import PatternComponent, { TargetKey } from '@/components/Tabs';
 import axios from 'axios';
-import { produce } from 'immer';
 import TableComponent from '@/components/Table';
 import { PlusOutlined } from '@ant-design/icons';
 import LoadingComponent from '@/components/Loading';
+import { produce } from 'immer';
 
 export default function RootPage() {
   // ---------- ref ----------
