@@ -49,16 +49,46 @@ jobs:
           echo "Assignee Name 1: $assignee_display_name"
           echo "linear issue id: $LINEAR_ISSUE_ID"
 
-          query='{"query": "mutation test { commentCreate(input: { issueId: \"'$LINEAR_ISSUE_ID'\", bodyData: { type: \"doc\", content: [ { type: \"paragraph\", content: [ { type: \"text\", text: \"Hi \" }, { type: \"suggestion_userMentions\", attrs: { id: \"'$assignee_id'\", label: \"'$assignee_display_name'\" } }, { type: \"text\", text: \" \" }, { type: \"text\", text: \"code built to Develop\" } ] } ] } ) { success } }"}'
+          json_payload=$(cat <<EOF
+            {
+              "query": "mutation test {
+              commentCreate(input: {
+                issueId: \"$LINEAR_ISSUE_ID\",
+                bodyData: {
+                  type: \"doc\",
+                  content: [
+                    {
+                      type: \"paragraph\",
+                      content: [
+                        {
+                          type: \"text\",
+                          text: \"Hi \"
+                        },
+                        {
+                          type: \"suggestion_userMentions\",
+                          attrs: {
+                            id: \"$assignee_id\",
+                            label: \"$assignee_display_name\"
+                          }
+                        },
+                        {
+                          type: \"text\",
+                          text: \" code built to Develop\"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }) {
+                success
+              }
+            }"
+            }
+            EOF
+            )
           
-          headers='{"Content-Type": "application/json", "Authorization": "Bearer '$LINEAR_API_TOKEN'"}'
-
-          response=$(curl -s -X POST \
-            -H "Content-Type: application/json" \
-            -H "Authorization: $LINEAR_API_TOKEN" \
-            -d "$query" \
-            https://api.linear.app/graphql)
+          response=$(curl -s -X POST -H "Content-Type: application/json" -H "Authorization: Bearer $LINEAR_API_TOKEN" -d "$json_payload" https://api.linear.app/graphql)
           
           success=$(echo "$response" | jq -r '.data.commentCreate.success')
           
-          echo "success: $success"
+          echo "Success: $success"
