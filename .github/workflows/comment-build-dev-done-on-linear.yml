@@ -60,3 +60,5 @@ jobs:
             https://api.linear.app/graphql)
           
           success=$(echo "$response" | jq -r '.data.commentCreate.success')
+          
+          echo "success: $success"
