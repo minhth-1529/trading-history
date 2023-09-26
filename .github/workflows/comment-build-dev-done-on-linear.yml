@@ -49,7 +49,7 @@ jobs:
           echo "Assignee Name 1: $assignee_display_name"
           echo "linear issue id: $LINEAR_ISSUE_ID"
 
-          query='{"query": "mutation { commentCreate(input: { issueId: \"D1-1700\", bodyData: { type: \"doc\", content: [ { type: \"paragraph\", content: [ { type: \"text\", text: \"Hi \" }, { type: \"suggestion_userMentions\", attrs: { id: \"dbbb5527-5bd5-41be-91e5-577d9e4fdb38\", label: \"minh_tranhoang\" } }, { type: \"text\", text: \" \" }, { type: \"text\", text: \"code built to Develop\" } ] } ] } }) { success } }"}'
+          query='{"query": "mutation { commentCreate(input: { issueId: \"'$LINEAR_ISSUE_ID'\", bodyData: { type: \"doc\", content: [ { type: \"paragraph\", content: [ { type: \"text\", text: \"Hi \" }, { type: \"suggestion_userMentions\", attrs: { id: \"'$assignee_id'\", label: \"'$assignee_display_name'\" } }, { type: \"text\", text: \" \" }, { type: \"text\", text: \"code built to Develop\" } ] } ] } }) { success } }"}'
           
           headers='{"Content-Type": "application/json", "Authorization": "Bearer '$LINEAR_API_TOKEN'"}'
 
