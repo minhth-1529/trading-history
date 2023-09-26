@@ -10,6 +10,17 @@ jobs:
     name: linear Integration
     runs-on: ubuntu-latest
     steps:
+      - name: print latest commit message
+        env:
+          LAST_COMMIT_MESSAGE: "D1-1700"
+        run: |
+          echo "last commit message: $LAST_COMMIT_MESSAGE"
+      - uses: actions-ecosystem/action-regex-match@v2
+        id: regex-match
+        with:
+          text: ${{ github.event.workflow_run.head_commit.message }}
+          regex: '^.+(D1-[0-9]+).*$'
+          flags: gm
       - name: linear issue comment
         if: ${{ steps.regex-match.outputs.match != '' }}
         env:
