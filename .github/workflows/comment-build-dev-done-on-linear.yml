@@ -8,7 +8,6 @@ on:
 jobs:
   linear-integration:
     name: linear Integration
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
       - name: print latest commit message
