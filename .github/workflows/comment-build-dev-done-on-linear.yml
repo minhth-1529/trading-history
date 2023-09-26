@@ -22,7 +22,7 @@ jobs:
           regex: '^.+(D1-[0-9]+).*$'
           flags: gm
       - name: linear issue comment
-        if: ${{ steps.regex-match.outputs.match != '' }}
+        
         env:
           LINEAR_ISSUE_ID: ${{ steps.regex-match.outputs.group1 }}
           LINEAR_API_TOKEN: ${{ secrets.LINEAR_BOT_TOKEN }}
