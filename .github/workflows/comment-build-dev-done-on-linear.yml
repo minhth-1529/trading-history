@@ -65,13 +65,3 @@ jobs:
           
           errors=$(echo "$response" | jq -r '.errors')
           success=$(echo "$response" | jq -r '.data.commentCreate.success')
-          
-          if [ -n "$errors" ]; then
-            echo "GraphQL errors: $errors"
-          else
-            if [ "$success" == "true" ]; then
-              echo "Comment created successfully."
-            else
-              echo "Failed to create comment."
-            fi
-          fi
