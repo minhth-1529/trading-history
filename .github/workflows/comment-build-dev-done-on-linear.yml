@@ -1,11 +1,6 @@
 name: Notification To Team
 
 on:
-  workflow_run:
-    workflows:
-      - CRM Frontend CI
-    types:
-      - completed
   pull_request:
     types:
       - closed
@@ -15,7 +10,6 @@ on:
 jobs:
   linear-integration:
     name: linear Integration
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
       - name: print latest commit message
