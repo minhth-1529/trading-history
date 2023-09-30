@@ -153,18 +153,18 @@ export default function RootPage() {
     router.replace(`?${query}`);
   };
 
-  const onPatternChange = (value: string) => {
-    setActivePattern(value);
-    onReplaceQueryParams(value, null);
-    formRef.setFieldValue('condition', originData[value].condition);
-  };
-
   const onPatternEdit = (targetKey: TargetKey, action: 'add' | 'remove') => {
     if (action === 'add') {
       patternModalRef.current && patternModalRef.current.addNew();
     } else {
       removePattern(targetKey);
     }
+  };
+
+  const onPatternChange = (value: string) => {
+    setActivePattern(value);
+    onReplaceQueryParams(value, null);
+    formRef.setFieldValue('condition', originData[value].condition);
   };
 
   // fetch data
