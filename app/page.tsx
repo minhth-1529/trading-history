@@ -5,7 +5,7 @@ import EntryModal, { TAddNewRef } from '@/components/modal/EntryModal';
 import PatternModal, { TPatternModal } from '@/components/modal/PatternModal';
 import { FloatButton, Form, Input, message, Tabs } from 'antd';
 import { ICondition, IDataType, SUMMARY_ENUM, TOriginDataType } from '@/module/interface';
-import { assign, get, startCase, sumBy, unionBy, values } from 'lodash';
+import { assign, get, isNil, startCase, sumBy, unionBy, values } from 'lodash';
 import dayjs from 'dayjs';
 import { fetchPattern, handlePutPattern } from '@/lib/axiosTabs';
 import PatternComponent, { TargetKey } from '@/components/Tabs';
@@ -14,16 +14,22 @@ import TableComponent from '@/components/Table';
 import { produce } from 'immer';
 import { PlusOutlined } from '@ant-design/icons';
 import LoadingComponent from '@/components/Loading';
+import { useRouter, useSearchParams } from 'next/navigation';
+import qs from 'qs';
 
 export default function RootPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const queryPattern = searchParams.get('pattern');
+  const querySummary = searchParams.get('summary');
   // ---------- ref ----------
   const tradeModalRef = useRef<TAddNewRef>(null);
   const patternModalRef = useRef<TPatternModal>(null);
   const [formRef] = Form.useForm<ICondition>();
 
   // ---------- state ----------
-  const [loading, setLoading] = useState<boolean>(true);
-
+  const [apiLoading, setApiLoading] = useState<boolean>(true);
+  const [queryLoading, setQueryLoading] = useState<boolean>(true);
   // ---------- data ----------
   const [originData, setOriginData] = useState<TOriginDataType>({});
 
@@ -82,7 +88,7 @@ export default function RootPage() {
 
   const removePattern = (targetKey: TargetKey) => {
     if (patternData.length === 1) {
-      return message.error('Can not delete the last one!').then();
+      message.error('Can not delete the last one!').then();
     }
 
     let newActiveKey = activePattern;
@@ -138,12 +144,22 @@ export default function RootPage() {
     axiosPutData(data);
   };
 
-  const onTabChange = (value: string) => {
+  const onReplaceQueryParams = (pattern: string | null, summary: string | null) => {
+    const query = qs.stringify({
+      pattern: pattern ?? activePattern,
+      summary: summary ?? activeSummary
+    });
+
+    router.replace(`?${query}`);
+  };
+
+  const onPatternChange = (value: string) => {
     setActivePattern(value);
+    onReplaceQueryParams(value, null);
     formRef.setFieldValue('condition', originData[value].condition);
   };
 
-  const onTabEdit = (targetKey: TargetKey, action: 'add' | 'remove') => {
+  const onPatternEdit = (targetKey: TargetKey, action: 'add' | 'remove') => {
     if (action === 'add') {
       patternModalRef.current && patternModalRef.current.addNew();
     } else {
@@ -161,15 +177,25 @@ export default function RootPage() {
         setOriginData(originData);
         setPatternData(tabsData);
 
-        setActivePattern(tabsData.at(0));
         formRef.setFieldValue('condition', originData[tabsData.at(0)].condition);
 
-        setLoading(false);
+        setApiLoading(false);
       })
     );
   }, []);
 
-  return !loading ? (
+  useEffect(() => {
+    if (isNil(queryPattern) || isNil(querySummary)) {
+      router.replace(`?${qs.stringify({ pattern: '123BO', summary: SUMMARY_ENUM.STATISTICAL })}`);
+    } else {
+      setActivePattern(queryPattern);
+      setActiveSummary(querySummary as SUMMARY_ENUM);
+    }
+
+    setQueryLoading(false);
+  }, [queryPattern, querySummary]);
+
+  return !apiLoading && !queryLoading ? (
     <main className="relative mx-auto max-w-screen-xl px-4 py-10  md:py-10">
       <section>
         <FloatButton
@@ -188,8 +214,12 @@ export default function RootPage() {
       </section>
       <section className={'flex w-full'}>
         <Tabs
+          activeKey={activeSummary}
           className={'pt-[50px]'}
-          onChange={(value) => setActiveSummary(value as SUMMARY_ENUM)}
+          onChange={(value) => {
+            onReplaceQueryParams(null, value);
+            setActiveSummary(value as SUMMARY_ENUM);
+          }}
           tabPosition={'left'}
           items={values(SUMMARY_ENUM).map((item) => ({
             label: startCase(item),
@@ -198,7 +228,7 @@ export default function RootPage() {
         />
         <div className={'w-full'}>
           <div>
-            <PatternComponent data={patternData} activePattern={activePattern} onPatternChange={onTabChange} onPatternEdit={onTabEdit} />
+            <PatternComponent data={patternData} activePattern={activePattern} onPatternChange={onPatternChange} onPatternEdit={onPatternEdit} />
           </div>
           <div className={'rounded-2 mb-5 bg-gray-100'}>
             <div className={'mx-auto p-4'}>

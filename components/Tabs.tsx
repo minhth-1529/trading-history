@@ -19,8 +19,7 @@ const PatternComponent: React.FC<IProps> = ({
   return (
     <Tabs
       type="editable-card"
-      defaultActiveKey={activePattern}
-      accessKey={activePattern}
+      activeKey={activePattern}
       onChange={onPatternChange}
       onEdit={onPatternEdit}
       items={data.map((item) => ({ label: item, key: item }))}
