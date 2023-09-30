@@ -1,9 +1,7 @@
-name: Comment Build Dev Done on Linear
+name: Notification To Team
 
 on:
   workflow_run:
-    workflows:
-      - CRM Frontend CI
     types:
       - completed
   pull_request:
@@ -37,4 +35,8 @@ jobs:
         run: |
           set -e
           
+          echo 'test'
+          echo 'test'
+          echo 'test'
+          echo 'test'
           echo 'test'
