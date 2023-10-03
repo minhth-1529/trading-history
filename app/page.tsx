@@ -196,7 +196,7 @@ export default function RootPage() {
   }, [queryPattern, querySummary]);
 
   return !apiLoading && !queryLoading ? (
-    <main className="relative mx-auto max-w-screen-xl px-4 py-10  md:py-10">
+    <main className="relative mx-auto max-w-screen-2xl px-4 py-10  md:py-10">
       <section>
         <FloatButton
           onClick={() => tradeModalRef.current && tradeModalRef.current.addNew()}

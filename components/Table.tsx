@@ -17,10 +17,13 @@ export default function TableComponent({ data, onEdit, onDelete }: IProps) {
   return (
     <Table
       pagination={{
+        position: ['topRight', 'bottomRight'],
         size: 'small',
         defaultPageSize: 20,
         showTotal:(total, range) => `${range[0]}-${range[1]} of ${total} items`
       }}
+      className={'max-w-[1368px]'}
+      scroll={{ x: 1368 }}
       columns={[
         {
           title: "Pair",
@@ -57,7 +60,7 @@ export default function TableComponent({ data, onEdit, onDelete }: IProps) {
           title: "Date",
           dataIndex: "date",
           key: "date",
-          width: 150,
+          width: 170,
           defaultSortOrder: 'descend',
           sorter: (a, b) => {
             return dayjs(a.date).isAfter(dayjs(b.date)) ? 1 : -1
@@ -103,7 +106,7 @@ export default function TableComponent({ data, onEdit, onDelete }: IProps) {
           title: "Image",
           dataIndex: "img",
           key: "image",
-          width: 100,
+          width: 130,
           render: (value) =>
             value ? (
               <Image height={100} width={100} preview={true} src={value} />
@@ -118,7 +121,7 @@ export default function TableComponent({ data, onEdit, onDelete }: IProps) {
             value ? <div className={"whitespace-pre-line"}>{value}</div> : null,
         },
         {
-          title: "Note",
+          title: "Advantage",
           dataIndex: "advantage",
           key: "advantage",
           width: 250,
@@ -126,7 +129,7 @@ export default function TableComponent({ data, onEdit, onDelete }: IProps) {
             value ? <div className={"whitespace-pre-line"}>{value}</div> : null,
         },
         {
-          title: "Note",
+          title: "Disadvantage",
           dataIndex: "disadvantage",
           key: "disadvantage",
           width: 250,
@@ -137,6 +140,7 @@ export default function TableComponent({ data, onEdit, onDelete }: IProps) {
           title: "Action",
           key: "action",
           width: 80,
+          fixed: 'right',
           render: (_, record) => {
             return (
               <Dropdown
