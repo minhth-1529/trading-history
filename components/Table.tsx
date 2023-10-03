@@ -118,6 +118,22 @@ export default function TableComponent({ data, onEdit, onDelete }: IProps) {
             value ? <div className={"whitespace-pre-line"}>{value}</div> : null,
         },
         {
+          title: "Note",
+          dataIndex: "advantage",
+          key: "advantage",
+          width: 250,
+          render: (value) =>
+            value ? <div className={"whitespace-pre-line"}>{value}</div> : null,
+        },
+        {
+          title: "Note",
+          dataIndex: "disadvantage",
+          key: "disadvantage",
+          width: 250,
+          render: (value) =>
+            value ? <div className={"whitespace-pre-line"}>{value}</div> : null,
+        },
+        {
           title: "Action",
           key: "action",
           width: 80,

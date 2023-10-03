@@ -36,6 +36,8 @@ export interface IDataType {
   rule: boolean;
   img: string;
   note: string;
+  advantage: string;
+  disadvantage: string;
 }
 
 export interface IPattern {

@@ -173,6 +173,12 @@ const EntryModal = forwardRef<TAddNewRef, IProps>(({ onFinish }, ref) => {
         <Form.Item label={"Note"} name={"note"}>
           <Input.TextArea rows={4} />
         </Form.Item>
+        <Form.Item label={"Advantage"} name={"advantage"}>
+          <Input.TextArea rows={4} />
+        </Form.Item>
+        <Form.Item label={"Disadvantage"} name={"disadvantage"}>
+          <Input.TextArea rows={4} />
+        </Form.Item>
       </Form>
     </Modal>
   );
