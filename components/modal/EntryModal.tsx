@@ -1,5 +1,5 @@
 'use client';
-import { forwardRef, useImperativeHandle, useState } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import { DatePicker, Form, Input, InputNumber, Modal, Select } from 'antd';
 import { v4 as uuidv4 } from 'uuid';
 import { assign, upperCase, values } from 'lodash';
@@ -14,10 +14,11 @@ export type TAddNewRef = {
 };
 
 interface IProps {
+  data: IDataType[];
   onFinish: (value: IDataType) => void;
 }
 
-const EntryModal = forwardRef<TAddNewRef, IProps>(({ onFinish }, ref) => {
+const EntryModal = forwardRef<TAddNewRef, IProps>(({ onFinish, data }, ref) => {
   const [formRef] = Form.useForm<IDataType>();
   const [loading,setLoading] = useState<boolean>(false)
   const [open, setOpen] = useState<boolean>(false);
@@ -52,6 +53,10 @@ const EntryModal = forwardRef<TAddNewRef, IProps>(({ onFinish }, ref) => {
       });
     },
   }));
+
+  useEffect(() => {
+    formRef.setFieldValue('date', data[0].date ? dayjs(data[0].date) : dayjs())
+  }, [data]);
 
   return (
     <Modal
@@ -125,7 +130,7 @@ const EntryModal = forwardRef<TAddNewRef, IProps>(({ onFinish }, ref) => {
           name={"date"}
         >
           <DatePicker
-            showTime={{ format: "HH:mm" }}
+            showTime={{ format: "HH:mm", minuteStep: 5 }}
             format="DD/MM/YYYY HH:mm"
             className={"w-full"}
           />

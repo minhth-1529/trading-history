@@ -13,7 +13,6 @@ export type TConditionModal = {
 const ConditionModal = forwardRef<TConditionModal, IProps>(
   ({ onFinish }, ref) => {
     const [formRef] = Form.useForm<ICondition>();
-    const [loading,setLoading] = useState<boolean>(false)
     const [open, setOpen] = useState<boolean>(false);
 
     const afterClose = () => {
@@ -21,10 +20,7 @@ const ConditionModal = forwardRef<TConditionModal, IProps>(
     };
 
     const handleFinish = (value: ICondition) => {
-      setLoading(true)
-
       setTimeout(()=>{
-        setLoading(false)
         onFinish(value.condition);
         setOpen(false);
       },1000)

@@ -22,8 +22,8 @@ export default function TableComponent({ data, onEdit, onDelete }: IProps) {
         defaultPageSize: 20,
         showTotal:(total, range) => `${range[0]}-${range[1]} of ${total} items`
       }}
-      className={'max-w-[1368px]'}
-      scroll={{ x: 1368 }}
+      className={'max-w-[1500px]'}
+      scroll={{ x: 1500 }}
       columns={[
         {
           title: "Pair",
@@ -113,14 +113,6 @@ export default function TableComponent({ data, onEdit, onDelete }: IProps) {
             ) : null,
         },
         {
-          title: "Note",
-          dataIndex: "note",
-          key: "note",
-          width: 250,
-          render: (value) =>
-            value ? <div className={"whitespace-pre-line"}>{value}</div> : null,
-        },
-        {
           title: "Advantage",
           dataIndex: "advantage",
           key: "advantage",
@@ -132,6 +124,14 @@ export default function TableComponent({ data, onEdit, onDelete }: IProps) {
           title: "Disadvantage",
           dataIndex: "disadvantage",
           key: "disadvantage",
+          width: 250,
+          render: (value) =>
+            value ? <div className={"whitespace-pre-line"}>{value}</div> : null,
+        },
+        {
+          title: "Note",
+          dataIndex: "note",
+          key: "note",
           width: 250,
           render: (value) =>
             value ? <div className={"whitespace-pre-line"}>{value}</div> : null,

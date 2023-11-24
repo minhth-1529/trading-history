@@ -196,7 +196,7 @@ export default function RootPage() {
   }, [queryPattern, querySummary]);
 
   return !apiLoading && !queryLoading ? (
-    <main className="relative mx-auto max-w-screen-2xl px-4 py-10  md:py-10">
+    <main className="max-w-screen-3xl relative mx-auto px-4 py-10  md:py-10">
       <section>
         <FloatButton
           onClick={() => tradeModalRef.current && tradeModalRef.current.addNew()}
@@ -250,7 +250,7 @@ export default function RootPage() {
         </div>
       </section>
       <PatternModal ref={patternModalRef} onFinish={onFinishPatternModal} />
-      <EntryModal ref={tradeModalRef} onFinish={onFinishTradeModal} />
+      <EntryModal data={originData[activePattern][activeSummary]} ref={tradeModalRef} onFinish={onFinishTradeModal} />
     </main>
   ) : (
     <LoadingComponent />
