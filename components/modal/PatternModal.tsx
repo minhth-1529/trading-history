@@ -1,3 +1,4 @@
+'use client';
 import React, { forwardRef, useImperativeHandle, useState } from 'react';
 import { Form, Input, Modal } from 'antd';
 import { IPattern } from '@/module/interface';

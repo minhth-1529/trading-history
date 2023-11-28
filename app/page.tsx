@@ -250,7 +250,13 @@ export default function RootPage() {
         </div>
       </section>
       <PatternModal ref={patternModalRef} onFinish={onFinishPatternModal} />
-      <EntryModal data={originData[activePattern][activeSummary]} ref={tradeModalRef} onFinish={onFinishTradeModal} />
+      <EntryModal
+        data={originData[activePattern][activeSummary].sort(
+          (a, b) => new Date(dayjs(b.date).toISOString()).getTime() - new Date(dayjs(a.date).toISOString()).getTime()
+        )}
+        ref={tradeModalRef}
+        onFinish={onFinishTradeModal}
+      />
     </main>
   ) : (
     <LoadingComponent />

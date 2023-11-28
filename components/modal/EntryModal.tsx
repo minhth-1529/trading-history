@@ -53,9 +53,9 @@ const EntryModal = forwardRef<TAddNewRef, IProps>(({ onFinish, data }, ref) => {
       });
     },
   }));
-  
+
   useEffect(() => {
-    if (formRef.getFieldValue('id')) return;
+    if (formRef.getFieldValue('pair')) return;
 
     formRef.setFieldValue('date', data[0].date ? dayjs(data[0].date) : dayjs())
   }, [open]);
