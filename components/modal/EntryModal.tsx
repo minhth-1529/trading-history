@@ -1,24 +1,23 @@
 'use client';
-import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
+import { forwardRef, useImperativeHandle, useState } from 'react';
 import { DatePicker, Form, Input, InputNumber, Modal, Select } from 'antd';
 import { v4 as uuidv4 } from 'uuid';
 import { assign, upperCase, values } from 'lodash';
 import { orderColor } from '@/module/constants';
 import { IDataType, ORDER_ENUM, PAIR_ENUM } from '@/module/interface';
-import dayjs from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
 import stringToHexColor from '@/lib/stringToHexColor';
 
 export type TAddNewRef = {
-  addNew: () => void;
+  addNew: (date: Dayjs) => void;
   edit: (record: IDataType) => void;
 };
 
 interface IProps {
-  data: IDataType[];
   onFinish: (value: IDataType) => void;
 }
 
-const EntryModal = forwardRef<TAddNewRef, IProps>(({ onFinish, data }, ref) => {
+const EntryModal = forwardRef<TAddNewRef, IProps>(({ onFinish }, ref) => {
   const [formRef] = Form.useForm<IDataType>();
   const [loading,setLoading] = useState<boolean>(false)
   const [open, setOpen] = useState<boolean>(false);
@@ -38,9 +37,10 @@ const EntryModal = forwardRef<TAddNewRef, IProps>(({ onFinish, data }, ref) => {
   };
 
   useImperativeHandle(ref, () => ({
-    addNew: () => {
+    addNew: (date) => {
       setOpen(true);
       formRef.setFieldsValue({
+        date,
         id: uuidv4(),
       });
     },
@@ -53,14 +53,6 @@ const EntryModal = forwardRef<TAddNewRef, IProps>(({ onFinish, data }, ref) => {
       });
     },
   }));
-
-  useEffect(() => {
-    if (formRef.getFieldValue('pair')) return;
-
-    formRef.setFieldValue('date', data[0].date ? dayjs(data[0].date) : dayjs())
-  }, [open]);
-
-
 
   return (
     <Modal

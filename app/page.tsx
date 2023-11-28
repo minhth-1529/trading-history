@@ -5,7 +5,7 @@ import EntryModal, { TAddNewRef } from '@/components/modal/EntryModal';
 import PatternModal, { TPatternModal } from '@/components/modal/PatternModal';
 import { FloatButton, Form, Input, message, Tabs } from 'antd';
 import { ICondition, IDataType, SUMMARY_ENUM, TOriginDataType } from '@/module/interface';
-import { assign, get, isNil, startCase, sumBy, unionBy, values } from 'lodash';
+import { assign, get, head, isNil, orderBy, startCase, sumBy, unionBy, values } from 'lodash';
 import dayjs from 'dayjs';
 import { fetchPattern, handlePutPattern } from '@/lib/axiosTabs';
 import PatternComponent, { TargetKey } from '@/components/Tabs';
@@ -199,7 +199,18 @@ export default function RootPage() {
     <main className="max-w-screen-3xl relative mx-auto px-4 py-10  md:py-10">
       <section>
         <FloatButton
-          onClick={() => tradeModalRef.current && tradeModalRef.current.addNew()}
+          onClick={() =>
+            tradeModalRef.current &&
+            tradeModalRef.current.addNew(
+              dayjs(
+                get(
+                  head(orderBy(originData[activePattern][activeSummary], [(item) => new Date(dayjs(item.date).toISOString())], ['desc'])),
+                  'date',
+                  ''
+                )
+              )
+            )
+          }
           icon={<PlusOutlined />}
           type="primary"
           style={{ right: 20, bottom: 20 }}
@@ -250,13 +261,7 @@ export default function RootPage() {
         </div>
       </section>
       <PatternModal ref={patternModalRef} onFinish={onFinishPatternModal} />
-      <EntryModal
-        data={originData[activePattern][activeSummary].sort(
-          (a, b) => new Date(dayjs(b.date).toISOString()).getTime() - new Date(dayjs(a.date).toISOString()).getTime()
-        )}
-        ref={tradeModalRef}
-        onFinish={onFinishTradeModal}
-      />
+      <EntryModal ref={tradeModalRef} onFinish={onFinishTradeModal} />
     </main>
   ) : (
     <LoadingComponent />
