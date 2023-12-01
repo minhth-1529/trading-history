@@ -1,12 +1,12 @@
-'use client';
-import { forwardRef, useImperativeHandle, useState } from 'react';
-import { DatePicker, Form, Input, InputNumber, Modal, Select } from 'antd';
-import { v4 as uuidv4 } from 'uuid';
-import { assign, upperCase, values } from 'lodash';
-import { orderColor } from '@/module/constants';
-import { IDataType, ORDER_ENUM, PAIR_ENUM } from '@/module/interface';
-import dayjs, { Dayjs } from 'dayjs';
-import stringToHexColor from '@/lib/stringToHexColor';
+"use client";
+import { forwardRef, useImperativeHandle, useState } from "react";
+import { DatePicker, Form, Input, InputNumber, Modal, Select } from "antd";
+import { v4 as uuidv4 } from "uuid";
+import { assign, upperCase, values } from "lodash";
+import { orderColor } from "@/module/constants";
+import { IDataType, ORDER_ENUM, PAIR_ENUM } from "@/module/interface";
+import dayjs, { Dayjs } from "dayjs";
+import stringToHexColor from "@/lib/stringToHexColor";
 
 export type TAddNewRef = {
   addNew: (date: Dayjs) => void;
@@ -19,7 +19,7 @@ interface IProps {
 
 const EntryModal = forwardRef<TAddNewRef, IProps>(({ onFinish }, ref) => {
   const [formRef] = Form.useForm<IDataType>();
-  const [loading,setLoading] = useState<boolean>(false)
+  const [loading, setLoading] = useState<boolean>(false);
   const [open, setOpen] = useState<boolean>(false);
 
   const afterClose = () => {
@@ -27,13 +27,13 @@ const EntryModal = forwardRef<TAddNewRef, IProps>(({ onFinish }, ref) => {
   };
 
   const handleFinish = (value: IDataType) => {
-    setLoading(true)
+    setLoading(true);
 
-    setTimeout(()=>{
-      setLoading(false)
+    setTimeout(() => {
+      setLoading(false);
       onFinish(value);
       setOpen(false);
-    },1000)
+    }, 1000);
   };
 
   useImperativeHandle(ref, () => ({
@@ -41,7 +41,7 @@ const EntryModal = forwardRef<TAddNewRef, IProps>(({ onFinish }, ref) => {
       setOpen(true);
       formRef.setFieldsValue({
         date,
-        id: uuidv4(),
+        id: uuidv4()
       });
     },
     edit: (record) => {
@@ -49,9 +49,9 @@ const EntryModal = forwardRef<TAddNewRef, IProps>(({ onFinish }, ref) => {
 
       formRef.setFieldsValue({
         ...record,
-        ...assign({ date: dayjs(record.date) }),
+        ...assign({ date: dayjs(record.date) })
       });
-    },
+    }
   }));
 
   return (
@@ -64,9 +64,9 @@ const EntryModal = forwardRef<TAddNewRef, IProps>(({ onFinish }, ref) => {
       onOk={formRef.submit}
       afterClose={afterClose}
       confirmLoading={loading}
-      okText={'Submit'}
-      okButtonProps={{size: 'small'}}
-      cancelButtonProps={{size: 'small'}}
+      okText={"Submit"}
+      okButtonProps={{ size: "small" }}
+      cancelButtonProps={{ size: "small" }}
     >
       <Form
         onFinish={handleFinish}
@@ -90,13 +90,13 @@ const EntryModal = forwardRef<TAddNewRef, IProps>(({ onFinish }, ref) => {
                     "items-center inline-flex rounded-md  px-2 py-1 text-xs font-medium text-white"
                   }
                   style={{
-                    backgroundColor: stringToHexColor(item) as string,
+                    backgroundColor: stringToHexColor(item) as string
                   }}
                 >
                   {item.toLocaleUpperCase()}
                 </span>
               ),
-              value: item,
+              value: item
             }))}
           />
         </Form.Item>
@@ -116,7 +116,7 @@ const EntryModal = forwardRef<TAddNewRef, IProps>(({ onFinish }, ref) => {
                   {upperCase(item)}
                 </span>
               ),
-              value: item,
+              value: item
             }))}
           />
         </Form.Item>
@@ -153,7 +153,7 @@ const EntryModal = forwardRef<TAddNewRef, IProps>(({ onFinish }, ref) => {
                     True
                   </span>
                 ),
-                value: true,
+                value: true
               },
               {
                 label: (
@@ -163,8 +163,8 @@ const EntryModal = forwardRef<TAddNewRef, IProps>(({ onFinish }, ref) => {
                     False
                   </span>
                 ),
-                value: false,
-              },
+                value: false
+              }
             ]}
           />
         </Form.Item>

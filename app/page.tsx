@@ -1,21 +1,21 @@
 'use client';
-import React, { useEffect, useRef, useState } from 'react';
-import { fetchData, handlePutData } from '@/lib/axiosData';
-import EntryModal, { TAddNewRef } from '@/components/modal/EntryModal';
-import PatternModal, { TPatternModal } from '@/components/modal/PatternModal';
-import { FloatButton, Form, Input, message, Tabs } from 'antd';
-import { ICondition, IDataType, SUMMARY_ENUM, TOriginDataType } from '@/module/interface';
-import { assign, get, head, isNil, orderBy, startCase, sumBy, unionBy, values } from 'lodash';
-import dayjs from 'dayjs';
-import { fetchPattern, handlePutPattern } from '@/lib/axiosTabs';
-import PatternComponent, { TargetKey } from '@/components/Tabs';
-import axios from 'axios';
-import TableComponent from '@/components/Table';
-import { produce } from 'immer';
-import { PlusOutlined } from '@ant-design/icons';
-import LoadingComponent from '@/components/Loading';
-import { useRouter, useSearchParams } from 'next/navigation';
-import qs from 'qs';
+import React, { useEffect, useRef, useState } from "react";
+import { fetchData, handlePutData } from "@/lib/axiosData";
+import EntryModal, { TAddNewRef } from "@/components/modal/EntryModal";
+import PatternModal, { TPatternModal } from "@/components/modal/PatternModal";
+import { FloatButton, Form, Input, message, Tabs } from "antd";
+import { ICondition, IDataType, SUMMARY_ENUM, TOriginDataType } from "@/module/interface";
+import { assign, get, head, isNil, orderBy, startCase, sumBy, unionBy, values } from "lodash";
+import dayjs from "dayjs";
+import { fetchPattern, handlePutPattern } from "@/lib/axiosTabs";
+import PatternComponent, { TargetKey } from "@/components/Tabs";
+import axios from "axios";
+import TableComponent from "@/components/Table";
+import { produce } from "immer";
+import { PlusOutlined } from "@ant-design/icons";
+import LoadingComponent from "@/components/Loading";
+import { useRouter, useSearchParams } from "next/navigation";
+import qs from "qs";
 
 export default function RootPage() {
   const router = useRouter();
@@ -206,7 +206,7 @@ export default function RootPage() {
                 get(
                   head(orderBy(originData[activePattern][activeSummary], [(item) => new Date(dayjs(item.date).toISOString())], ['desc'])),
                   'date',
-                  ''
+                  dayjs()
                 )
               )
             )

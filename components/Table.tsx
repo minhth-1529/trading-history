@@ -1,11 +1,11 @@
-import stringToHexColor from '@/lib/stringToHexColor';
-import { orderColor } from '@/module/constants';
-import { upperCase } from 'lodash';
-import dayjs from 'dayjs';
-import cls from 'classnames';
-import { Dropdown, Image, Table } from 'antd';
-import { DeleteOutlined, EditOutlined, EllipsisOutlined } from '@ant-design/icons';
-import { IDataType, ORDER_ENUM } from '@/module/interface';
+import stringToHexColor from "@/lib/stringToHexColor";
+import { orderColor } from "@/module/constants";
+import { upperCase } from "lodash";
+import dayjs from "dayjs";
+import cls from "classnames";
+import { Dropdown, Image, Table } from "antd";
+import { DeleteOutlined, EditOutlined, EllipsisOutlined } from "@ant-design/icons";
+import { IDataType, ORDER_ENUM } from "@/module/interface";
 
 interface IProps {
   data: IDataType[];
@@ -22,8 +22,6 @@ export default function TableComponent({ data, onEdit, onDelete }: IProps) {
         defaultPageSize: 20,
         showTotal:(total, range) => `${range[0]}-${range[1]} of ${total} items`
       }}
-      className={'max-w-[1500px]'}
-      scroll={{ x: 1500 }}
       columns={[
         {
           title: "Pair",
